@@ -1,0 +1,328 @@
+import React, {useEffect, useState} from 'react';
+import ScreenWrapper from '../../components/ScreenWrapper';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import BackButton from '../../components/BackButton';
+import {Colors, FontFamily} from '../../../Utils/Themes';
+import {LogOutIcon, ProfileEditIcon} from '../../components/Icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from '../../../axios';
+
+function updateProfile({navigation}) {
+  const Height = Dimensions.get('window').height;
+  const [userData, setUserData] = useState({
+    fullName: '',
+    email: '',
+    mobile: '',
+    profileImage: null,
+  });
+  const [userDisplay, setUserDisplayData] = useState({
+    fullName: '',
+    email: '',
+    mobile: '',
+    profileImage: null,
+  });
+
+  const [validationErrors, setValidationErrors] = useState({
+    fullName: '',
+    mobile: '',
+  });
+  const fetchData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        navigation.navigate('Login');
+        return;
+      }
+      const userDataString = await AsyncStorage.getItem('userData');
+      if (userDataString) {
+        let data = JSON.parse(userDataString);
+        setUserData({...data, mobile: data.mobile.toString()});
+        setUserDisplayData(data);
+      } else {
+        axios
+          .get('/v1/user/profile')
+          .then(async res => {
+            console.log('res---', res.data?.mobile);
+            setUserData({
+              ...res.data,
+              mobile: res.data.mobile.toString(),
+            });
+
+            setUserDisplayData(res.data);
+            await AsyncStorage.setItem('userData', JSON.stringify(res.data));
+          })
+          .catch(error => {
+            console.log(error?.request);
+          });
+      }
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+    }
+  };
+  const handleUpdateProfile = async () => {
+    const errors = {};
+    console.log('userData-----------', userData);
+    if (userData.fullName.length < 3 || userData.fullName.length > 15) {
+      errors.fullName = 'name must be between 3 and 15 characters.';
+    } else {
+      errors.fullName = '';
+    }
+
+    if (!userData.mobile.trim()) {
+      errors.mobile = 'Phone number is required.';
+    } else {
+      const phoneRegex = /^[0-9]{10}$/; // Adjust as per your requirements
+      errors.mobile = phoneRegex.test(userData.mobile)
+        ? ''
+        : 'Invalid phone number format.';
+    }
+
+    setValidationErrors(errors);
+
+    if (Object.values(errors).some(error => error !== '')) {
+      return;
+    }
+    axios
+      .put('/v1/user/profile', userData)
+      .then(async res => {
+        console.log('res', res);
+        setUserDisplayData(userData);
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      })
+      .catch(error => {
+        console.log(error?.request);
+      });
+  };
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('userData');
+    navigation.navigate('Login');
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+  return (
+    <ScreenWrapper>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View>
+          <View>
+            <BackButton />
+          </View>
+
+          <View style={styles.profileImageContainer}>
+            <View style={{position: 'relative'}}>
+              <Image
+                source={require('../../assets/Images/profile-user.png')}
+                style={styles.profileImage}
+              />
+              <View style={styles.profileEditIcon}>
+                <ProfileEditIcon />
+              </View>
+            </View>
+            <View>
+              <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
+              <Text style={styles.emailText}>{userDisplay?.email}</Text>
+              <View
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: 12,
+                  paddingTop: 7,
+                }}>
+                <View style={styles.logOutIcon}>
+                  <LogOutIcon />
+                </View>
+                <Text style={styles.logOutText} onPress={handleLogout}>
+                  Log out
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Name */}
+          <View style={{paddingTop: 20}}>
+            <Text style={styles.lableText}>Name</Text>
+            <TextInput
+              style={styles.inputStyle}
+              placeholder="Enter your name"
+              placeholderTextColor={Colors.white}
+              autoCapitalize="none"
+              value={userData?.fullName}
+              onChangeText={text => setUserData({...userData, fullName: text})}
+            />
+          </View>
+          {validationErrors?.fullName && (
+            <Text style={styles.errorText}>{validationErrors?.fullName}</Text>
+          )}
+
+          {/* Email */}
+          <View style={{paddingTop: 10}}>
+            <Text style={styles.lableText}>Email</Text>
+            <TextInput
+              style={styles.inputStyle}
+              placeholder="Enter your email"
+              placeholderTextColor={Colors.white}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={userData?.email}
+              editable={false}
+            />
+          </View>
+
+          {/* Phone number */}
+          <View style={{paddingTop: 10}}>
+            <Text style={styles.lableText}>Phone Number</Text>
+            <TextInput
+              style={styles.inputStyle}
+              placeholder="Enter your number"
+              placeholderTextColor={Colors.white}
+              autoCapitalize="none"
+              keyboardType="numeric"
+              value={userData.mobile} // Ensure mobile is defined
+              onChangeText={text => setUserData({...userData, mobile: text})}
+            />
+          </View>
+          {validationErrors?.mobile && (
+            <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
+          )}
+
+          {/* Password */}
+          {/* <View style={{paddingTop: 10}}>
+            <Text style={styles.lableText}>Password</Text>
+            <TextInput
+              style={styles.inputStyle}
+              placeholder="Enter your new password"
+              placeholderTextColor={Colors.white}
+              secureTextEntry
+              autoCapitalize="none"
+              value={userData?.password}
+              editable={false}
+            />
+          </View> */}
+
+          <View>
+            <TouchableOpacity
+              style={styles.buttonNext}
+              onPress={handleUpdateProfile}>
+              <Text style={styles.buttonText}>Update Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </ScreenWrapper>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  profileEditIcon: {
+    width: 28,
+    height: 28,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 100,
+    padding: 4,
+    backgroundColor: '#4A05AD',
+    position: 'absolute',
+    right: 0,
+    bottom: 10,
+  },
+  logOutIcon: {
+    width: 22,
+    height: 22,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 100,
+    backgroundColor: '#4A05ADCC',
+  },
+  profileImageContainer: {
+    paddingTop: 40,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
+    gap: 15,
+  },
+  logOutText: {
+    fontWeight: '400',
+    fontFamily: FontFamily.TimeRoman,
+    color: '#FFFFFFB2',
+    fontSize: 12,
+  },
+  emailText: {
+    fontWeight: '400',
+    fontFamily: FontFamily.TimeRoman,
+    color: '#FFFFFFCC',
+    fontSize: 12,
+    paddingTop: 4,
+  },
+  nameText: {
+    fontWeight: '600',
+    fontFamily: FontFamily.TimeRoman,
+    color: '#FFFFFF',
+    fontSize: 20,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderWidth: 4,
+    borderColor: Colors.white,
+    borderRadius: 60,
+  },
+  inputStyle: {
+    fontSize: 14,
+    color: Colors.white,
+    fontFamily: FontFamily.TimeRoman,
+    width: '100%',
+    fontWeight: '400',
+    borderWidth: 1,
+    borderColor: Colors.white,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF59',
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+  },
+  lableText: {
+    fontFamily: FontFamily.TimeRoman,
+    color: Colors.white,
+    fontSize: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    fontWeight: '400',
+  },
+  buttonText: {
+    color: '#4A05AD',
+    fontSize: 16,
+    textAlign: 'center',
+    fontFamily: FontFamily.TimeRoman,
+  },
+  buttonNext: {
+    backgroundColor: Colors.white,
+    borderRadius: 22,
+    width: '100%',
+    marginTop: 100,
+    marginBottom: 30,
+    padding: 12,
+  },
+  errorText: {
+    color: Colors.darkRed,
+    fontSize: 12,
+    marginTop: 5,
+    marginHorizontal: 15,
+  },
+});
+export default updateProfile;
