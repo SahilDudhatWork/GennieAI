@@ -1,14 +1,7 @@
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
-  Text,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, View, Text} from 'react-native';
 import ScreenWrapper from '../../components/ScreenWrapper';
-import {FontFamily} from '../../../Utils/Themes';
+import {Colors, FontFamily} from '../../../Utils/Themes';
 import DropDownPicker from 'react-native-dropdown-picker';
 import {LanguageIcon} from '../../components/Icons';
 import BackButton from '../../components/BackButton';
@@ -32,16 +25,7 @@ function SelectLanguage({navigation}) {
         <BackButton />
       </View>
       <View style={{paddingTop: 50}}>
-        <Text
-          style={{
-            fontSize: 22,
-            fontWeight: '600',
-            color: '#FFFFFF',
-            fontFamily: FontFamily.TimeRoman,
-            textAlign: 'center',
-          }}>
-          Select your Language
-        </Text>
+        <Text style={styles.selectLanguageText}>Select your Language</Text>
       </View>
       <View style={{paddingTop: 20}}>
         <DropDownPicker
@@ -57,13 +41,13 @@ function SelectLanguage({navigation}) {
           textStyle={{
             fontSize: 16,
             fontWeight: '400',
-            color: '#FFFFFF',
+            color: Colors.white,
             fontFamily: FontFamily.TimeRoman,
           }}
           labelStyle={{
             fontSize: 16,
             fontWeight: '400',
-            color: '#FFFFFF',
+            color: Colors.white,
             fontFamily: FontFamily.TimeRoman,
           }}
         />
@@ -86,6 +70,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backdropFilter: 'blur(4px)',
   },
+  selectLanguageText: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: Colors.white,
+    fontFamily: FontFamily.TimeRoman,
+    textAlign: 'center',
+  },
   label: {
     fontSize: 16,
     fontWeight: '600',
@@ -93,7 +84,7 @@ const styles = StyleSheet.create({
   dropdown: {
     marginTop: 5,
     borderWidth: 1,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.white,
     borderRadius: 12,
     backdropFilter: 'blur(4px)',
     backgroundColor: '#FFFFFF59',
@@ -102,7 +93,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderWidth: 1,
     borderRadius: 12,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.white,
     backdropFilter: 'blur(4px)',
     backgroundColor: '#FFFFFF59',
   },

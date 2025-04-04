@@ -19,4 +19,5 @@ export const Colors = {
 export const FontFamily = {
   TimeRoman: 'times-new-roman',
   TimeRomanBold: 'times-new-roman-bold',
+  Inter: 'Inter',
 };

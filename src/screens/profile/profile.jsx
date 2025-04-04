@@ -15,9 +15,11 @@ import {Colors, FontFamily} from '../../../Utils/Themes';
 import {LogOutIcon, ProfileEditIcon} from '../../components/Icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../../../axios';
+import {DotIndicator} from 'react-native-indicators';
 
-function updateProfile({navigation}) {
+function UpdateProfile({navigation}) {
   const Height = Dimensions.get('window').height;
+  const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
     fullName: '',
     email: '',
@@ -45,16 +47,17 @@ function updateProfile({navigation}) {
       const userDataString = await AsyncStorage.getItem('userData');
       if (userDataString) {
         let data = JSON.parse(userDataString);
-        setUserData({...data, mobile: data.mobile.toString()});
+        setUserData({...data, mobile: data?.mobile?.toString()});
         setUserDisplayData(data);
       } else {
+        setLoading(true);
         axios
           .get('/v1/user/profile')
           .then(async res => {
             console.log('res---', res.data?.mobile);
             setUserData({
               ...res.data,
-              mobile: res.data.mobile.toString(),
+              mobile: res.data?.mobile?.toString(),
             });
 
             setUserDisplayData(res.data);
@@ -62,7 +65,8 @@ function updateProfile({navigation}) {
           })
           .catch(error => {
             console.log(error?.request);
-          });
+          })
+          .finally(() => setLoading(false));
       }
     } catch (error) {
       console.error('Error retrieving user data:', error);
@@ -70,7 +74,6 @@ function updateProfile({navigation}) {
   };
   const handleUpdateProfile = async () => {
     const errors = {};
-    console.log('userData-----------', userData);
     if (userData.fullName.length < 3 || userData.fullName.length > 15) {
       errors.fullName = 'name must be between 3 and 15 characters.';
     } else {
@@ -80,7 +83,7 @@ function updateProfile({navigation}) {
     if (!userData.mobile.trim()) {
       errors.mobile = 'Phone number is required.';
     } else {
-      const phoneRegex = /^[0-9]{10}$/; // Adjust as per your requirements
+      const phoneRegex = /^[0-9]{10}$/;
       errors.mobile = phoneRegex.test(userData.mobile)
         ? ''
         : 'Invalid phone number format.';
@@ -91,6 +94,7 @@ function updateProfile({navigation}) {
     if (Object.values(errors).some(error => error !== '')) {
       return;
     }
+    setLoading(true);
     axios
       .put('/v1/user/profile', userData)
       .then(async res => {
@@ -100,7 +104,8 @@ function updateProfile({navigation}) {
       })
       .catch(error => {
         console.log(error?.request);
-      });
+      })
+      .finally(() => setLoading(false));
   };
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
@@ -111,93 +116,98 @@ function updateProfile({navigation}) {
     fetchData();
   }, []);
   return (
-    <ScreenWrapper>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View>
+    <>
+      <ScreenWrapper>
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={false}>
           <View>
-            <BackButton />
-          </View>
-
-          <View style={styles.profileImageContainer}>
-            <View style={{position: 'relative'}}>
-              <Image
-                source={require('../../assets/Images/profile-user.png')}
-                style={styles.profileImage}
-              />
-              <View style={styles.profileEditIcon}>
-                <ProfileEditIcon />
-              </View>
-            </View>
             <View>
-              <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
-              <Text style={styles.emailText}>{userDisplay?.email}</Text>
-              <View
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  gap: 12,
-                  paddingTop: 7,
-                }}>
-                <View style={styles.logOutIcon}>
-                  <LogOutIcon />
+              <BackButton />
+            </View>
+
+            <View style={styles.profileImageContainer}>
+              <View style={{position: 'relative'}}>
+                <Image
+                  source={require('../../assets/Images/profile-user.png')}
+                  style={styles.profileImage}
+                />
+                <View style={styles.profileEditIcon}>
+                  <ProfileEditIcon />
                 </View>
-                <Text style={styles.logOutText} onPress={handleLogout}>
-                  Log out
-                </Text>
+              </View>
+              <View>
+                <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
+                <Text style={styles.emailText}>{userDisplay?.email}</Text>
+                <View
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    gap: 12,
+                    paddingTop: 7,
+                  }}>
+                  <View style={styles.logOutIcon}>
+                    <LogOutIcon />
+                  </View>
+                  <Text style={styles.logOutText} onPress={handleLogout}>
+                    Log out
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          {/* Name */}
-          <View style={{paddingTop: 20}}>
-            <Text style={styles.lableText}>Name</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your name"
-              placeholderTextColor={Colors.white}
-              autoCapitalize="none"
-              value={userData?.fullName}
-              onChangeText={text => setUserData({...userData, fullName: text})}
-            />
-          </View>
-          {validationErrors?.fullName && (
-            <Text style={styles.errorText}>{validationErrors?.fullName}</Text>
-          )}
+            {/* Name */}
+            <View style={{paddingTop: 20}}>
+              <Text style={styles.lableText}>Name</Text>
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your name"
+                placeholderTextColor={Colors.white}
+                autoCapitalize="none"
+                value={userData?.fullName}
+                onChangeText={text =>
+                  setUserData({...userData, fullName: text})
+                }
+              />
+            </View>
+            {validationErrors?.fullName && (
+              <Text style={styles.errorText}>{validationErrors?.fullName}</Text>
+            )}
 
-          {/* Email */}
-          <View style={{paddingTop: 10}}>
-            <Text style={styles.lableText}>Email</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your email"
-              placeholderTextColor={Colors.white}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={userData?.email}
-              editable={false}
-            />
-          </View>
+            {/* Email */}
+            <View style={{paddingTop: 10}}>
+              <Text style={styles.lableText}>Email</Text>
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your email"
+                placeholderTextColor={Colors.white}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={userData?.email}
+                editable={false}
+              />
+            </View>
 
-          {/* Phone number */}
-          <View style={{paddingTop: 10}}>
-            <Text style={styles.lableText}>Phone Number</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your number"
-              placeholderTextColor={Colors.white}
-              autoCapitalize="none"
-              keyboardType="numeric"
-              value={userData.mobile} // Ensure mobile is defined
-              onChangeText={text => setUserData({...userData, mobile: text})}
-            />
-          </View>
-          {validationErrors?.mobile && (
-            <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
-          )}
+            {/* Phone number */}
+            <View style={{paddingTop: 10}}>
+              <Text style={styles.lableText}>Phone Number</Text>
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your number"
+                placeholderTextColor={Colors.white}
+                autoCapitalize="none"
+                keyboardType="numeric"
+                value={userData.mobile} // Ensure mobile is defined
+                onChangeText={text => setUserData({...userData, mobile: text})}
+              />
+            </View>
+            {validationErrors?.mobile && (
+              <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
+            )}
 
-          {/* Password */}
-          {/* <View style={{paddingTop: 10}}>
+            {/* Password */}
+            {/* <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>Password</Text>
             <TextInput
               style={styles.inputStyle}
@@ -210,22 +220,39 @@ function updateProfile({navigation}) {
             />
           </View> */}
 
-          <View>
-            <TouchableOpacity
-              style={styles.buttonNext}
-              onPress={handleUpdateProfile}>
-              <Text style={styles.buttonText}>Update Profile</Text>
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                style={styles.buttonNext}
+                onPress={handleUpdateProfile}>
+                <Text style={styles.buttonText}>Update Profile</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+        </ScrollView>
+      </ScreenWrapper>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <DotIndicator color="white" size={15} />
         </View>
-      </ScrollView>
-    </ScreenWrapper>
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
   },
   profileEditIcon: {
     width: 28,
@@ -325,4 +352,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
 });
-export default updateProfile;
+export default UpdateProfile;

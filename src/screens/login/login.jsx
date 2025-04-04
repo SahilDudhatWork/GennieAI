@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -8,18 +8,28 @@ import {
   TextInput,
   ScrollView,
   Dimensions,
+  Alert,
+  Platform,
 } from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import BackButton from '../../components/BackButton';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import {DotIndicator} from 'react-native-indicators';
+import Config from '../../../config';
 
-function login({navigation}) {
+function Login({navigation}) {
   const [userData, setUserData] = useState({
     email: '',
     password: '',
+    loginType: 'Web',
   });
+  const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState({
     email: '',
     password: '',
@@ -27,12 +37,16 @@ function login({navigation}) {
   const [apiErrorMsg, setApiErrorMsg] = useState('');
 
   const Height = Dimensions.get('window').height;
-
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: Config.WEB_CLIENT_ID,
+      offlineAccess: true,
+    });
+  }, []);
   const handleLogin = () => {
     const errors = {};
     setApiErrorMsg('');
 
-    console.log('userData-->', userData);
     if (!userData.email.trim()) {
       errors.email = 'Email is required.';
     } else {
@@ -53,6 +67,7 @@ function login({navigation}) {
     if (Object.values(errors).some(error => error !== '')) {
       return;
     }
+    setLoading(true);
     axios
       .post('/v1/user/auth/login', userData)
       .then(async res => {
@@ -74,176 +89,192 @@ function login({navigation}) {
             setApiErrorMsg(apiError);
           }
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
-  return (
-    <ScreenWrapper>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            height: Height - 40,
-          }}>
-          <View>
-            <BackButton />
-          </View>
-          <View style={styles.inputSeaction}>
-            <Text
-              style={{
-                fontFamily: FontFamily.TimeRoman,
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: '600',
-              }}>
-              Login
-            </Text>
-            <Text
-              style={{
-                fontFamily: FontFamily.TimeRoman,
-                color: Colors.white,
-                fontSize: 13,
-                paddingTop: 5,
-                fontWeight: '400',
-              }}>
-              Welcome back to the app
-            </Text>
-          </View>
-          <View>
-            <View style={styles.inputSeaction}>
-              <Text style={styles.lableText}>Email</Text>
-              <TextInput
-                style={styles.inputStyle}
-                placeholder="Enter your email"
-                placeholderTextColor={Colors.white}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={text => setUserData({...userData, email: text})}
-              />
-            </View>
-            {validationErrors?.email && (
-              <Text style={styles.errorText}>{validationErrors?.email}</Text>
-            )}
-            {apiErrorMsg != '' && (
-              <Text style={styles.errorText}>{apiErrorMsg}</Text>
-            )}
-            {/* Password */}
-            <View style={{paddingTop: 10}}>
-              <Text style={styles.lableText}>Password</Text>
-              <TextInput
-                style={styles.inputStyle}
-                placeholder="Enter your password"
-                placeholderTextColor={Colors.white}
-                secureTextEntry
-                autoCapitalize="none"
-                onChangeText={text =>
-                  setUserData({...userData, password: text})
-                }
-              />
-            </View>
-            {validationErrors?.password && (
-              <Text style={styles.errorText}>{validationErrors?.password}</Text>
-            )}
-            <View>
-              <Text
-                onPress={() => {
-                  navigation.navigate('ForgotPassword');
-                }}
-                style={{
-                  fontSize: 12,
-                  fontWeight: '400',
-                  paddingTop: 10,
-                  color: Colors.white,
-                  textAlign: 'right',
-                  paddingHorizontal: 5,
-                  fontFamily: FontFamily.TimeRoman,
-                  textDecorationLine: 'underline',
-                }}>
-                Forgot Password?
-              </Text>
-            </View>
-            <View>
-              <TouchableOpacity
-                style={styles.buttonLogin}
-                onPress={handleLogin}>
-                <Text style={styles.buttonLoginText}>Login</Text>
-              </TouchableOpacity>
-            </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingTop: 40,
-              }}>
-              <View
-                style={{flex: 1, height: 1, backgroundColor: Colors.white}}
-              />
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: '400',
-                  color: Colors.white,
-                  fontFamily: FontFamily.TimeRoman,
-                  paddingHorizontal: 30,
-                }}>
-                Or sign in with
-              </Text>
-              <View
-                style={{flex: 1, height: 1, backgroundColor: Colors.white}}
-              />
+  const handleGoogleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+
+      const userData = {
+        fullName: userInfo.data.user.name,
+        email: userInfo.data.user.email,
+        loginType: 'Google',
+      };
+      console.log('userData--=-=-=-', userData);
+      setLoading(true);
+      axios
+        .post('/v1/user/auth/login', userData)
+        .then(async res => {
+          console.log('res', res.data);
+          if (res?.data?.accessToken) {
+            await AsyncStorage.setItem(
+              'token',
+              JSON.stringify(res?.data?.accessToken),
+            );
+            navigation.navigate('Chat');
+          }
+        })
+        .catch(error => {
+          console.log(error?.request, 'error?.request');
+        })
+        .finally(() => setLoading(false));
+    } catch (error) {
+      console.log('Error during Google sign in:', error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('User cancelled the login flow');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('Sign in is in progress');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('Play services not available');
+        Alert.alert('Error', 'Google Play Services are not available');
+      } else {
+        Alert.alert('Error', 'Something went wrong with Google Sign-In');
+      }
+    }
+  };
+
+  return (
+    <>
+      <ScreenWrapper>
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={false}>
+          <View
+            style={{
+              height: Height - 40,
+            }}>
+            <View>
+              <BackButton />
             </View>
-            <View style={styles.signupOr}>
-              <TouchableOpacity>
-                <Image
-                  source={require('../../assets/Images/auth/google.png')}
-                  style={{width: 40, height: 40}}
+            <View style={styles.inputSeaction}>
+              <Text style={styles.loginTitleText}>Login</Text>
+              <Text style={styles.welcomeBackText}>
+                Welcome back to the app
+              </Text>
+            </View>
+            <View>
+              <View style={styles.inputSeaction}>
+                <Text style={styles.lableText}>Email</Text>
+                <TextInput
+                  style={styles.inputStyle}
+                  placeholder="Enter your email"
+                  placeholderTextColor={Colors.white}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={text => setUserData({...userData, email: text})}
                 />
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <Image
-                  source={require('../../assets/Images/auth/apple.png')}
-                  style={{width: 40, height: 40}}
+              </View>
+              {validationErrors?.email && (
+                <Text style={styles.errorText}>{validationErrors?.email}</Text>
+              )}
+              {apiErrorMsg != '' && (
+                <Text style={styles.errorText}>{apiErrorMsg}</Text>
+              )}
+              {/* Password */}
+              <View style={{paddingTop: 10}}>
+                <Text style={styles.lableText}>Password</Text>
+                <TextInput
+                  style={styles.inputStyle}
+                  placeholder="Enter your password"
+                  placeholderTextColor={Colors.white}
+                  secureTextEntry
+                  autoCapitalize="none"
+                  onChangeText={text =>
+                    setUserData({...userData, password: text})
+                  }
                 />
-              </TouchableOpacity>
+              </View>
+              {validationErrors?.password && (
+                <Text style={styles.errorText}>
+                  {validationErrors?.password}
+                </Text>
+              )}
+              <View>
+                <Text
+                  onPress={() => {
+                    navigation.navigate('ForgotPassword');
+                  }}
+                  style={styles.forgotPasswordText}>
+                  Forgot Password?
+                </Text>
+              </View>
+
+              <View>
+                <TouchableOpacity
+                  style={styles.buttonLogin}
+                  onPress={handleLogin}>
+                  <Text style={styles.buttonLoginText}>Login</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.orSignContainer}>
+                <View
+                  style={{flex: 1, height: 1, backgroundColor: Colors.white}}
+                />
+                <Text style={styles.orSignText}>Or sign in with</Text>
+                <View
+                  style={{flex: 1, height: 1, backgroundColor: Colors.white}}
+                />
+              </View>
+              <View style={styles.signupOr}>
+                <TouchableOpacity onPress={handleGoogleLogin}>
+                  <Image
+                    source={require('../../assets/Images/auth/google.png')}
+                    style={{width: 40, height: 40}}
+                  />
+                </TouchableOpacity>
+
+                {Platform.OS === 'ios' && (
+                  <TouchableOpacity>
+                    <Image
+                      source={require('../../assets/Images/auth/apple.png')}
+                      style={{width: 40, height: 40}}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+            <View style={{position: 'absolute', bottom: 0, width: '100%'}}>
+              <Text style={styles.accountText}>
+                Don’t have an account?{' '}
+                <Text
+                  style={{textDecorationLine: 'underline'}}
+                  onPress={() => {
+                    navigation.navigate('Signup');
+                  }}>
+                  Create an account
+                </Text>
+              </Text>
             </View>
           </View>
-          <View style={{position: 'absolute', bottom: 0, width: '100%'}}>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: '400',
-                color: Colors.white,
-                fontFamily: FontFamily.TimeRoman,
-                textAlign: 'center',
-              }}>
-              Don’t have an account?{' '}
-              <Text
-                style={{textDecorationLine: 'underline'}}
-                onPress={() => {
-                  navigation.navigate('Signup');
-                }}>
-                Create an account
-              </Text>
-            </Text>
-          </View>
+        </ScrollView>
+      </ScreenWrapper>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <DotIndicator color="white" size={15} />
         </View>
-      </ScrollView>
-    </ScreenWrapper>
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF59',
-    borderRadius: 20,
-    backdropFilter: 'blur(4px)',
-    marginTop: 5,
-  },
   container: {
     flex: 1,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
   },
   buttonLoginText: {
     color: '#4A05AD',
@@ -257,6 +288,48 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 30,
     padding: 12,
+  },
+  loginTitleText: {
+    fontFamily: FontFamily.TimeRoman,
+    color: Colors.white,
+    fontSize: 22,
+    fontWeight: '600',
+  },
+  welcomeBackText: {
+    fontFamily: FontFamily.TimeRoman,
+    color: Colors.white,
+    fontSize: 13,
+    paddingTop: 5,
+    fontWeight: '400',
+  },
+  accountText: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: Colors.white,
+    fontFamily: FontFamily.TimeRoman,
+    textAlign: 'center',
+  },
+  forgotPasswordText: {
+    fontSize: 12,
+    fontWeight: '400',
+    paddingTop: 10,
+    color: Colors.white,
+    textAlign: 'right',
+    paddingHorizontal: 5,
+    fontFamily: FontFamily.TimeRoman,
+    textDecorationLine: 'underline',
+  },
+  orSignText: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: Colors.white,
+    fontFamily: FontFamily.TimeRoman,
+    paddingHorizontal: 30,
+  },
+  orSignContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 40,
   },
   inputStyle: {
     fontSize: 14,
@@ -295,4 +368,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
 });
-export default login;
+export default Login;

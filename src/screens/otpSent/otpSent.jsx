@@ -13,7 +13,7 @@ import {Colors, FontFamily} from '../../../Utils/Themes';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function otpSent({navigation}) {
+function OtpSent({navigation}) {
   const Height = Dimensions.get('window').height;
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(300);
@@ -121,15 +121,7 @@ function otpSent({navigation}) {
           <BackButton />
         </View>
         <View style={styles.inputSeaction}>
-          <Text
-            style={{
-              fontFamily: FontFamily.TimeRoman,
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: '600',
-            }}>
-            Otp
-          </Text>
+          <Text style={styles.otpText}>Otp</Text>
         </View>
 
         <View style={styles.otpContainer}>
@@ -190,6 +182,12 @@ const styles = StyleSheet.create({
   inputSeaction: {
     paddingTop: 40,
   },
+  otpText: {
+    fontFamily: FontFamily.TimeRoman,
+    color: Colors.white,
+    fontSize: 22,
+    fontWeight: '600',
+  },
   resendText: {
     color: Colors.white,
     fontSize: 14,
@@ -237,4 +235,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
 });
-export default otpSent;
+export default OtpSent;

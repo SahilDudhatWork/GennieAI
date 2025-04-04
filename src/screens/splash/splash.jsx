@@ -97,7 +97,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: 'center',
     justifyContent: 'flex-end',
-    transform: [{translateX: 0}, {translateY: 50}],
+    transform: [
+      {translateX: 0},
+      {translateY: Dimensions.get('window').height * 0.2},
+    ],
   },
   image: {
     width: 244,

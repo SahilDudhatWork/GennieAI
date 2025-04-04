@@ -13,7 +13,7 @@ import {Colors, FontFamily} from '../../../Utils/Themes';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function forgetPassword({navigation}) {
+function ForgetPassword({navigation}) {
   const Height = Dimensions.get('window').height;
   const [email, setEmail] = useState('');
   const [apiErrorMsg, setApiErrorMsg] = useState('');
@@ -149,4 +149,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
 });
-export default forgetPassword;
+export default ForgetPassword;

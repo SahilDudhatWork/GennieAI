@@ -13,7 +13,7 @@ import {Colors, FontFamily} from '../../../Utils/Themes';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function createPassword({navigation}) {
+function CreatePassword({navigation}) {
   const Height = Dimensions.get('window').height;
   const [userData, setUserData] = useState({
     newPassword: '',
@@ -181,4 +181,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
 });
-export default createPassword;
+export default CreatePassword;

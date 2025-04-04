@@ -3,15 +3,15 @@ import {StatusBar, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context'; // Import SafeAreaProvider
-import Splash from './src/screens/splash/splash';
-import Login from './src/screens/login/login';
-import Signup from './src/screens/signup/signup';
-import SelectLanguage from './src/screens/selectLanguage/selectLanguage';
-import ForgotPassword from './src/screens/forgotPassword/forgotPassword';
-import OtpSent from './src/screens/otpSent/otpSent';
-import CreatePassword from './src/screens/createPassword/createPassword';
-import Profile from './src/screens/profile/profile';
-import Chat from './src/screens/chat/chat';
+import Splash from './src/screens/splash/Splash';
+import Login from './src/screens/login/Login';
+import Signup from './src/screens/signup/Signup';
+import SelectLanguage from './src/screens/selectLanguage/SelectLanguage';
+import ForgotPassword from './src/screens/forgotPassword/ForgotPassword';
+import OtpSent from './src/screens/otpSent/OtpSent';
+import CreatePassword from './src/screens/createPassword/CreatePassword';
+import Profile from './src/screens/profile/Profile';
+import Chat from './src/screens/chat/Chat';
 
 const Stack = createStackNavigator();
 
