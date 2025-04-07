@@ -135,13 +135,14 @@ function Chat({navigation}) {
 
   const loadCurrentChat = async () => {
     try {
-      const storedChatsJson = await AsyncStorage.getItem('chatList');
+      const storedChatsJson = await AsyncStorage.getItem('chatMessages');
       const storedChats = storedChatsJson ? JSON.parse(storedChatsJson) : [];
 
       if (storedChats.length === 0) {
         const newChat = createNewChat();
         storedChats.push(newChat);
-        await AsyncStorage.setItem('chatList', JSON.stringify(storedChats));
+        await AsyncStorage.setItem('chatMessages', JSON.stringify(storedChats));
+
         setCurrentChat(newChat);
       } else {
         setCurrentChat(storedChats[storedChats.length - 1]);
@@ -149,83 +150,6 @@ function Chat({navigation}) {
     } catch (error) {
       console.error('Error loading chats:', error);
     }
-  };
-
-  const saveMessageToChat = async (userMessage, aiResponse) => {
-    try {
-      if (!currentChat) {
-        await loadCurrentChat();
-      }
-
-      if (!currentChat) {
-        const storedChatsJson = await AsyncStorage.getItem('chatList');
-        const storedChats = storedChatsJson ? JSON.parse(storedChatsJson) : [];
-
-        if (storedChats.length === 0) {
-          const newChat = createNewChat();
-          storedChats.push(newChat);
-          await AsyncStorage.setItem('chatList', JSON.stringify(storedChats));
-          setCurrentChat(newChat);
-
-          return await updateChatWithMessages(newChat, userMessage, aiResponse);
-        } else {
-          const latestChat = storedChats[storedChats.length - 1];
-          setCurrentChat(latestChat);
-          return await updateChatWithMessages(
-            latestChat,
-            userMessage,
-            aiResponse,
-          );
-        }
-      }
-
-      return await updateChatWithMessages(currentChat, userMessage, aiResponse);
-    } catch (error) {
-      console.error('Error saving message to chat:', error);
-      return null;
-    }
-  };
-
-  const updateChatWithMessages = async (chat, userMessage, aiResponse) => {
-    const updatedChat = JSON.parse(JSON.stringify(chat));
-
-    if (!updatedChat.messages) {
-      updatedChat.messages = [];
-    }
-
-    if (userMessage) {
-      updatedChat.messages.push({
-        id: Date.now().toString(),
-        text: userMessage,
-        sender: 'user',
-        timestamp: new Date(),
-      });
-    }
-
-    if (aiResponse) {
-      updatedChat.messages.push({
-        id: (Date.now() + 1).toString(),
-        text: aiResponse,
-        sender: 'ai',
-        timestamp: new Date(),
-      });
-    }
-
-    const storedChatsJson = await AsyncStorage.getItem('chatList');
-    const storedChats = storedChatsJson ? JSON.parse(storedChatsJson) : [];
-
-    const chatIndex = storedChats.findIndex(c => c.id === updatedChat.id);
-    if (chatIndex !== -1) {
-      storedChats[chatIndex] = updatedChat;
-    } else {
-      storedChats.push(updatedChat);
-    }
-
-    await AsyncStorage.setItem('chatList', JSON.stringify(storedChats));
-
-    setCurrentChat(updatedChat);
-
-    return updatedChat;
   };
 
   const checkNetworkConnectivity = async () => {
@@ -333,11 +257,17 @@ function Chat({navigation}) {
       setIsListening(false);
       setIsResponding(true);
 
-      if (!currentChat) {
-        await loadCurrentChat();
-      }
+      // if (!currentChat) {
+      //   await loadCurrentChat();
+      // }
+      const newUserMessage = {
+        id: Date.now().toString(),
+        chatId: uuid,
+        text: userQuery,
+        sender: 'user',
+      };
 
-      const updatedChatWithUserMsg = await saveMessageToChat(userQuery, null);
+      // const updatedChatWithUserMsg = await saveMessageToChat(userQuery, null);
 
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
@@ -353,7 +283,14 @@ function Chat({navigation}) {
         },
       );
       const aiResponse = response.data.choices[0].message.content.trim();
-      await updateChatWithMessages(updatedChatWithUserMsg, null, aiResponse);
+      const newBotMessage = {
+        id: (Date.now() + 1).toString(),
+        chatId: uuid,
+        text: aiResponse,
+        sender: 'ai',
+      };
+      // await updateChatWithMessages(updatedChatWithUserMsg, null, aiResponse);
+      await saveMessagesToStorage([newUserMessage, newBotMessage]);
       setIsResponding(false);
       speakResponse(aiResponse);
 
@@ -468,7 +405,11 @@ function Chat({navigation}) {
     setDropdownVisible(false);
     setMessages([]);
     setShowInput(false);
-    setUUID(generateUUID());
+    // setUUID(generateUUID());
+    // console.log('uuid', uuid);
+    const newId = generateUUID();
+    setUUID(newId);
+    console.log('New UUID:', newId);
   };
 
   const handleHistoryItemClick = async chatId => {
@@ -524,6 +465,7 @@ function Chat({navigation}) {
     const storedMessages = await AsyncStorage.getItem('chatMessages');
 
     let storedChatArray = storedMessages ? JSON.parse(storedMessages) : [];
+
     if (storedChatArray.length === 0) {
       Alert.alert(
         'No Chat History',
@@ -536,7 +478,7 @@ function Chat({navigation}) {
       const dateLabel = formatDate(message.id);
 
       if (!message.chatId) {
-        console.warn('chatId is undefined for message:', message);
+        // console.warn('chatId is undefined for message:', message);
         return acc;
       }
 
