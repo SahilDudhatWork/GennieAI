@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import {
   Dimensions,
@@ -16,6 +16,7 @@ import {LogOutIcon, ProfileEditIcon} from '../../components/Icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../../../axios';
 import {DotIndicator} from 'react-native-indicators';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 
 function UpdateProfile({navigation}) {
   const Height = Dimensions.get('window').height;
@@ -37,6 +38,16 @@ function UpdateProfile({navigation}) {
     fullName: '',
     mobile: '',
   });
+
+  const route = useRoute();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.setSelectedTab) {
+        route.params.setSelectedTab('Profile');
+      }
+    }, [route.params]),
+  );
   const fetchData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -110,7 +121,7 @@ function UpdateProfile({navigation}) {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('userData');
-    navigation.navigate('Login');
+    navigation.replace('Login');
   };
   useEffect(() => {
     fetchData();
@@ -139,21 +150,21 @@ function UpdateProfile({navigation}) {
               <View>
                 <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
                 <Text style={styles.emailText}>{userDisplay?.email}</Text>
-                <View
+                <TouchableOpacity
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     flexDirection: 'row',
                     gap: 12,
                     paddingTop: 7,
-                  }}>
+                  }}
+                  activeOpacity={0.5}
+                  onPress={handleLogout}>
                   <View style={styles.logOutIcon}>
                     <LogOutIcon />
                   </View>
-                  <Text style={styles.logOutText} onPress={handleLogout}>
-                    Log out
-                  </Text>
-                </View>
+                  <Text style={styles.logOutText}>Log out</Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -163,7 +174,7 @@ function UpdateProfile({navigation}) {
               <TextInput
                 style={styles.inputStyle}
                 placeholder="Enter your name"
-                placeholderTextColor={Colors.white}
+                placeholderTextColor={Colors.darkGray}
                 autoCapitalize="none"
                 value={userData?.fullName}
                 onChangeText={text =>
@@ -181,7 +192,7 @@ function UpdateProfile({navigation}) {
               <TextInput
                 style={styles.inputStyle}
                 placeholder="Enter your email"
-                placeholderTextColor={Colors.white}
+                placeholderTextColor={Colors.darkGray}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={userData?.email}
@@ -195,7 +206,7 @@ function UpdateProfile({navigation}) {
               <TextInput
                 style={styles.inputStyle}
                 placeholder="Enter your number"
-                placeholderTextColor={Colors.white}
+                placeholderTextColor={Colors.darkGray}
                 autoCapitalize="none"
                 keyboardType="numeric"
                 value={userData.mobile} // Ensure mobile is defined
@@ -212,7 +223,7 @@ function UpdateProfile({navigation}) {
             <TextInput
               style={styles.inputStyle}
               placeholder="Enter your new password"
-              placeholderTextColor={Colors.white}
+              placeholderTextColor={Colors.darkGray}
               secureTextEntry
               autoCapitalize="none"
               value={userData?.password}
@@ -232,7 +243,7 @@ function UpdateProfile({navigation}) {
       </ScreenWrapper>
       {loading && (
         <View style={styles.loadingOverlay}>
-          <DotIndicator color="white" size={15} />
+          <DotIndicator color="#4A05AD" size={15} />
         </View>
       )}
     </>
@@ -262,7 +273,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 100,
     padding: 4,
-    backgroundColor: '#4A05AD',
+    backgroundColor: Colors.deepViolet,
     position: 'absolute',
     right: 0,
     bottom: 10,
@@ -286,21 +297,21 @@ const styles = StyleSheet.create({
   },
   logOutText: {
     fontWeight: '400',
-    fontFamily: FontFamily.TimeRoman,
-    color: '#FFFFFFB2',
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 12,
   },
   emailText: {
     fontWeight: '400',
-    fontFamily: FontFamily.TimeRoman,
-    color: '#FFFFFFCC',
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 12,
     paddingTop: 4,
   },
   nameText: {
     fontWeight: '600',
-    fontFamily: FontFamily.TimeRoman,
-    color: '#FFFFFF',
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.deepViolet,
     fontSize: 20,
   },
   profileImage: {
@@ -312,33 +323,33 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     fontSize: 14,
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     width: '100%',
     fontWeight: '400',
     borderWidth: 1,
-    borderColor: Colors.white,
+    borderColor: Colors.darkGray,
     borderRadius: 12,
     backgroundColor: '#FFFFFF59',
     paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingVertical: 15,
   },
   lableText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
     fontWeight: '400',
   },
   buttonText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   buttonNext: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     marginTop: 100,

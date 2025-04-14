@@ -24,6 +24,8 @@ import {
 } from '@react-native-google-signin/google-signin';
 import {DotIndicator} from 'react-native-indicators';
 import Config from '../../../config';
+import {EmailIcon, LockIcon} from '../../components/Icons';
+import { appleAuth } from "@invertase/react-native-apple-authentication";
 
 function Signup({navigation}) {
   const [profileImage, setProfileImage] = useState(null);
@@ -109,7 +111,7 @@ function Signup({navigation}) {
             'token',
             JSON.stringify(res?.data?.accessToken),
           );
-          navigation.navigate('Chat');
+          navigation.navigate('Main', {screen: 'Chat'});
         }
       })
       .catch(error => {
@@ -147,7 +149,7 @@ function Signup({navigation}) {
               'token',
               JSON.stringify(res?.data?.accessToken),
             );
-            navigation.navigate('Chat');
+            navigation.navigate('Main', {screen: 'Chat'});
           }
         })
         .catch(error => {
@@ -169,9 +171,79 @@ function Signup({navigation}) {
     }
   };
 
+    // Apple Sign-In implementation
+    const handleAppleLogin = async () => {
+      // Check if Apple Authentication is available (iOS 13+)
+      if (!appleAuth.isSupported) {
+        Alert.alert(
+          "Error",
+          "Apple Sign In is only available on iOS 13 and above"
+        );
+        return;
+      }
+      try {
+        // Perform the apple sign-in request
+        const appleAuthRequestResponse = await appleAuth.performRequest({
+          requestedOperation: appleAuth.Operation.LOGIN,
+          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+        });
+  
+        // Get the credential state
+        const credentialState = await appleAuth.getCredentialStateForUser(
+          appleAuthRequestResponse.user
+        );
+  
+        if (credentialState === appleAuth.State.AUTHORIZED) {
+          const { user, email, fullName } = appleAuthRequestResponse;
+          if (fullName) {
+            const displayName = `${fullName.givenName} ${fullName.familyName}`;
+            const emailData = `${fullName.givenName}${fullName.familyName}@gmail.com`;
+            const userData = {
+              fullName: displayName,
+              email: emailData,
+              loginType: 'Apple',
+              password: 'null',
+            };
+
+            setLoading(true);
+            axios
+              .post('/v1/user/auth/signUp', userData)
+              .then(async res => {
+                if (res?.data?.accessToken) {
+                  await AsyncStorage.setItem('userData', JSON.stringify(userData));
+                  await AsyncStorage.setItem(
+                    'token',
+                    JSON.stringify(res?.data?.accessToken),
+                  );
+                  await AsyncStorage.setItem(
+                    'appleUserId',
+                    JSON.stringify(user),
+                  );
+                  navigation.navigate('Main', {screen: 'Chat'});
+                }
+              })
+              .catch(error => {
+                console.log(error?.request, 'error?.request');
+              })
+              .finally(() => setLoading(false));
+          }
+        } else {
+          Alert.alert("Error", "Apple Sign In failed");
+        }
+      } catch (error) {
+        if (error.code === appleAuth.Error.CANCELED) {
+          console.log('User cancelled Apple Sign-In');
+        } else {
+          console.error('Apple Sign-In Error:', error);
+        }
+        console.log("Error during Apple sign in:", error);
+        Alert.alert("Error", "Something went wrong with Apple Sign-In");
+      }
+    };
+
   return (
     <>
-      <ScreenWrapper>
+      <ScreenWrapper isSpecialBg={true}>
         <ScrollView
           style={styles.container}
           showsVerticalScrollIndicator={false}>
@@ -185,126 +257,89 @@ function Signup({navigation}) {
           {/* Name */}
           <View style={{paddingTop: 20}}>
             <Text style={styles.lableText}>Name</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your name"
-              placeholderTextColor="#FFFFFF"
-              autoCapitalize="none"
-              onChangeText={text => setUserData({...userData, fullName: text})}
-            />
-            {validationErrors?.fullName && (
-              <Text style={styles.errorText}>{validationErrors?.fullName}</Text>
-            )}
+            <View style={styles.inputWrapper}>
+              <EmailIcon style={styles.iconStyle} />
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your name"
+                placeholderTextColor="#575757"
+                autoCapitalize="none"
+                onChangeText={text =>
+                  setUserData({...userData, fullName: text})
+                }
+              />
+              {validationErrors?.fullName && (
+                <Text style={styles.errorText}>
+                  {validationErrors?.fullName}
+                </Text>
+              )}
+            </View>
           </View>
 
           {/* Email */}
           <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>Email</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your email"
-              placeholderTextColor="#FFFFFF"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              onChangeText={text => setUserData({...userData, email: text})}
-            />
-            {validationErrors?.email && (
-              <Text style={styles.errorText}>{validationErrors?.email}</Text>
-            )}
-            {emailTaken != '' && (
-              <Text style={styles.errorText}>{emailTaken}</Text>
-            )}
+            <View style={styles.inputWrapper}>
+              <EmailIcon style={styles.iconStyle} />
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your email"
+                placeholderTextColor="#575757"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={text => setUserData({...userData, email: text})}
+              />
+              {validationErrors?.email && (
+                <Text style={styles.errorText}>{validationErrors?.email}</Text>
+              )}
+              {emailTaken != '' && (
+                <Text style={styles.errorText}>{emailTaken}</Text>
+              )}
+            </View>
           </View>
 
           {/* Phone number */}
           <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>Phone Number</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your number"
-              placeholderTextColor="#FFFFFF"
-              autoCapitalize="none"
-              keyboardType="numeric"
-              onChangeText={text => setUserData({...userData, mobile: text})}
-            />
+            <View style={styles.inputWrapper}>
+              <LockIcon style={styles.iconStyle} />
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your number"
+                placeholderTextColor="#575757"
+                autoCapitalize="none"
+                keyboardType="numeric"
+                onChangeText={text => setUserData({...userData, mobile: text})}
+              />
 
-            {validationErrors?.mobile && (
-              <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
-            )}
+              {validationErrors?.mobile && (
+                <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
+              )}
+            </View>
           </View>
 
           {/* Password */}
           <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>Password</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your password"
-              placeholderTextColor="#FFFFFF"
-              secureTextEntry
-              autoCapitalize="none"
-              onChangeText={text => setUserData({...userData, password: text})}
-            />
-            {validationErrors?.password && (
-              <Text style={styles.errorText}>{validationErrors?.password}</Text>
-            )}
-          </View>
-
-          {/* Profile Picture */}
-
-          {/* <View style={{paddingTop: 10}}>
-          <Text
-            style={styles.lableText}s>
-            Profile Picture
-          </Text>
-
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              height: 90,
-              alignItems: 'center',
-              borderWidth: 1,
-              borderColor: Colors.white,
-              borderRadius: 12,
-              paddingHorizontal: 20,
-              backgroundColor: '#FFFFFF59',
-              justifyContent: 'center',
-            }}
-            onPress={handleImagePick}>
-            {profileImage ? (
-              <Image
-                source={{uri: profileImage}}
-                style={{width: 80, height: 80, borderRadius: 40}}
+            <View style={styles.inputWrapper}>
+              <LockIcon style={styles.iconStyle} />
+              <TextInput
+                style={styles.inputStyle}
+                placeholder="Enter your password"
+                placeholderTextColor="#575757"
+                secureTextEntry
+                autoCapitalize="none"
+                onChangeText={text =>
+                  setUserData({...userData, password: text})
+                }
               />
-            ) : (
-              <View style={{alignItems: 'center'}}>
-                <Text
-                  style={{
-                    fontFamily: FontFamily.TimeRoman,
-                    color: Colors.white,
-                    fontSize: 10,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    fontWeight: '400',
-                    textAlign: 'center',
-                  }}>
-                  Upload your profile picture here
+              {validationErrors?.password && (
+                <Text style={styles.errorText}>
+                  {validationErrors?.password}
                 </Text>
-                <Text
-                  style={{
-                    fontFamily: FontFamily.TimeRoman,
-                    color: Colors.white,
-                    fontSize: 9,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    fontWeight: '400',
-                    textAlign: 'center',
-                  }}>
-                  Supports: JPG, JPEG, PNG
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View> */}
+              )}
+            </View>
+          </View>
 
           <View>
             <TouchableOpacity
@@ -320,9 +355,13 @@ function Signup({navigation}) {
               alignItems: 'center',
               paddingTop: 20,
             }}>
-            <View style={{flex: 1, height: 1, backgroundColor: Colors.white}} />
+            <View
+              style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
+            />
             <Text style={styles.orSignUpText}>Or sign up with</Text>
-            <View style={{flex: 1, height: 1, backgroundColor: Colors.white}} />
+            <View
+              style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
+            />
           </View>
           <View style={styles.signupOr}>
             <TouchableOpacity onPress={handleGoogleLogin}>
@@ -332,7 +371,7 @@ function Signup({navigation}) {
               />
             </TouchableOpacity>
             {Platform.OS === 'ios' && (
-              <TouchableOpacity>
+              <TouchableOpacity onPress={handleAppleLogin}>
                 <Image
                   source={require('../../assets/Images/auth/apple.png')}
                   style={{width: 40, height: 40}}
@@ -344,7 +383,10 @@ function Signup({navigation}) {
             <Text style={styles.accountText}>
               I have an account?{' '}
               <Text
-                style={{textDecorationLine: 'underline'}}
+                style={{
+                  textDecorationLine: 'underline',
+                  color: Colors.deepViolet,
+                }}
                 onPress={() => {
                   navigation.navigate('Login');
                 }}>
@@ -356,7 +398,7 @@ function Signup({navigation}) {
       </ScreenWrapper>
       {loading && (
         <View style={styles.loadingOverlay}>
-          <DotIndicator color="white" size={15} />
+          <DotIndicator color="#4A05AD" size={15} />
         </View>
       )}
     </>
@@ -379,54 +421,63 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   buttonSigUpText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   accountText: {
     fontSize: 16,
     fontWeight: '400',
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     textAlign: 'center',
   },
   orSignUpText: {
     fontSize: 12,
     fontWeight: '400',
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     paddingHorizontal: 30,
   },
   signUpText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.deepViolet,
     fontSize: 22,
     fontWeight: '600',
   },
-  inputStyle: {
-    fontSize: 14,
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
-    width: '100%',
-    fontWeight: '400',
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.white,
+    borderColor: Colors.darkGray,
     borderRadius: 12,
     backgroundColor: '#FFFFFF59',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingHorizontal: 10,
+  },
+
+  iconStyle: {
+    marginRight: 10,
+  },
+  inputStyle: {
+    fontSize: 14,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
+    width: '100%',
+    fontWeight: '400',
+    paddingHorizontal: 10,
+    paddingVertical: 15,
   },
   lableText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
     fontWeight: '400',
   },
   buttonSignUp: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     marginTop: 30,

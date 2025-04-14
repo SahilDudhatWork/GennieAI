@@ -42,13 +42,13 @@ function SelectLanguage({navigation}) {
             fontSize: 16,
             fontWeight: '400',
             color: Colors.white,
-            fontFamily: FontFamily.TimeRoman,
+            fontFamily: FontFamily.SpaceGrotesk,
           }}
           labelStyle={{
             fontSize: 16,
             fontWeight: '400',
             color: Colors.white,
-            fontFamily: FontFamily.TimeRoman,
+            fontFamily: FontFamily.SpaceGrotesk,
           }}
         />
       </View>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '600',
     color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
     textAlign: 'center',
   },
   label: {

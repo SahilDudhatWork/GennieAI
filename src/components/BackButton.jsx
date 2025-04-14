@@ -2,6 +2,7 @@ import React from 'react';
 import {TouchableOpacity, View, StyleSheet} from 'react-native';
 import {BackIcon} from './Icons';
 import {useNavigation} from '@react-navigation/native';
+import { Colors } from '../../Utils/Themes';
 
 const BackButton = () => {
   const navigation = useNavigation();
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: Colors.deepViolet,
     borderRadius: 15,
   },
 });

@@ -30,9 +30,8 @@ import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Config from '../../../config';
 import LottieView from 'lottie-react-native';
-
-// import {LinearGradient} from 'react-native-linear-gradient';
-
+import {LinearGradient} from 'react-native-linear-gradient';
+import {useFocusEffect, useRoute} from '@react-navigation/native';
 function Chat({navigation}) {
   const [showInput, setShowInput] = useState(false);
   const [showChatBubble, setShowChatBubble] = useState(false);
@@ -50,6 +49,15 @@ function Chat({navigation}) {
   const [retryCount, setRetryCount] = useState(0);
   const [currentChat, setCurrentChat] = useState(null);
   const [uuid, setUUID] = useState(null);
+  const route = useRoute();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.setSelectedTab) {
+        route.params.setSelectedTab('Chat');
+      }
+    }, [route.params]),
+  );
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -99,27 +107,31 @@ function Chat({navigation}) {
     Tts.addEventListener('tts-finish', handleTtsFinish);
     Tts.addEventListener('tts-cancel', handleTtsCancel);
 
+    const startSub = Tts.addEventListener('tts-start', handleTtsStart);
+    const finishSub = Tts.addEventListener('tts-finish', handleTtsFinish);
+    const cancelSub = Tts.addEventListener('tts-cancel', handleTtsCancel);
+
     return () => {
-      Tts.removeEventListener('tts-start', handleTtsStart);
-      Tts.removeEventListener('tts-finish', handleTtsFinish);
-      Tts.removeEventListener('tts-cancel', handleTtsCancel);
+      startSub.remove();
+      finishSub.remove();
+      cancelSub.remove();
     };
   }, []);
 
   useEffect(() => {
     setUUID(generateUUID());
     const setupVoiceListeners = () => {
-      Voice.onSpeechStart = onSpeechStart;
-      Voice.onSpeechRecognized = onSpeechRecognized;
-      Voice.onSpeechEnd = onSpeechEnd;
-      Voice.onSpeechError = onSpeechError;
-      Voice.onSpeechResults = onSpeechResults;
+    Voice.onSpeechStart = onSpeechStart;
+    Voice.onSpeechRecognized = onSpeechRecognized;
+    Voice.onSpeechEnd = onSpeechEnd;
+    Voice.onSpeechError = onSpeechError;
+    Voice.onSpeechResults = onSpeechResults;
     };
 
     setupVoiceListeners();
 
-    return () => {
-      Voice.destroy().then(() => {
+    return async () => {
+      await Voice.destroy().then(() => {
         Voice.removeAllListeners();
         setIsListening(false);
       });
@@ -214,22 +226,44 @@ function Chat({navigation}) {
     },
     [retryCount],
   );
+  const endTimeoutRef = useRef(null);
+  const isRespondingRef = useRef(false);
+  const speechProcessedRef = useRef(false);
+  
+  useEffect(() => {
+    isRespondingRef.current = isResponding;
+  }, [isResponding]);
+  
 
-  const onSpeechResults = useCallback(
-    async e => {
-      console.log('Speech results:', e.value);
-      setIsListening(false);
-      if (e.value && e.value.length > 0) {
-        const recognizedText = e.value[0];
-        if (!currentChat) {
-          await loadCurrentChat();
-        }
-
-        getAIResponse(recognizedText);
+  const onSpeechResults = useCallback((e) => {
+    const transcript = e.value?.[0];
+    console.log('Speech results:', transcript);
+  
+    if (!transcript || isRespondingRef.current || speechProcessedRef.current) return;
+  
+    // Clear any existing timeout
+    if (endTimeoutRef.current) {
+      clearTimeout(endTimeoutRef.current);
+    }
+  
+    // Debounce + lock logic
+    endTimeoutRef.current = setTimeout(() => {
+      if (isRespondingRef.current || speechProcessedRef.current) {
+        console.log('Skipping due to active response or already processed speech');
+        return;
       }
-    },
-    [currentChat],
-  );
+  
+      console.log('Simulated speech end', transcript);
+      setIsListening(false);
+      speechProcessedRef.current = true;
+      getAIResponse(transcript);
+    }, 1200);
+  }, []);
+  
+  
+  
+  
+  
 
   const requestMicrophonePermission = async () => {
     if (Platform.OS === 'android') {
@@ -251,58 +285,63 @@ function Chat({navigation}) {
       return false;
     }
   };
-
-  const getAIResponse = async userQuery => {
+  const getAIResponse = async (userQuery) => {
     try {
-      setIsListening(false);
+      isRespondingRef.current = true;
+      speechProcessedRef.current = true;
       setIsResponding(true);
-
-      // if (!currentChat) {
-      //   await loadCurrentChat();
-      // }
+      setIsListening(false);
+      await Voice.stop();
+  
+      console.log('userQuery', userQuery);
+  
       const newUserMessage = {
         id: Date.now().toString(),
         chatId: uuid,
         text: userQuery,
         sender: 'user',
       };
-
-      // const updatedChatWithUserMsg = await saveMessageToChat(userQuery, null);
-
+  
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
           model: 'gpt-3.5-turbo',
-          messages: [{role: 'user', content: userQuery}],
+          messages: [{ role: 'user', content: userQuery }],
         },
         {
           headers: {
             Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
+  
       const aiResponse = response.data.choices[0].message.content.trim();
+      console.log('response.data', response.data);
+  
       const newBotMessage = {
         id: (Date.now() + 1).toString(),
         chatId: uuid,
         text: aiResponse,
         sender: 'ai',
       };
-      // await updateChatWithMessages(updatedChatWithUserMsg, null, aiResponse);
+  
       await saveMessagesToStorage([newUserMessage, newBotMessage]);
-      setIsResponding(false);
       speakResponse(aiResponse);
-
+  
       return aiResponse;
     } catch (error) {
       console.error('Error fetching AI response:', error);
       Alert.alert('Error', 'Failed to get response. Try again.');
       return null;
     } finally {
+      isRespondingRef.current = false;
+      speechProcessedRef.current = false; // reset for next input
       setIsResponding(false);
     }
   };
+  
+  
 
   const speakResponse = text => {
     if (!text) return;
@@ -387,6 +426,11 @@ function Chat({navigation}) {
     scrollViewRef.current?.scrollToEnd({animated: true});
   }, [messages]);
 
+  useEffect(() => {
+    if (route.params?.fromHistory && route.params.chatId) {
+      handleHistoryItemClick(route.params.chatId);
+    }
+  }, [route.params]);
   const saveMessagesToStorage = async newMessages => {
     try {
       const storedMessages = await AsyncStorage.getItem('chatMessages');
@@ -395,21 +439,23 @@ function Chat({navigation}) {
       const updatedChats = Array.isArray(storedChats)
         ? [...storedChats, ...newMessages]
         : [...newMessages];
-      console.log(updatedChats, 'updatedChats');
       await AsyncStorage.setItem('chatMessages', JSON.stringify(updatedChats));
     } catch (error) {
       console.log(' Error storing messages:', error);
     }
   };
   const handleNewChat = async () => {
-    setDropdownVisible(false);
-    setMessages([]);
-    setShowInput(false);
-    // setUUID(generateUUID());
-    // console.log('uuid', uuid);
     const newId = generateUUID();
     setUUID(newId);
     console.log('New UUID:', newId);
+    setDropdownVisible(false);
+    setMessages([]);
+    setShowInput(false);
+    // const newId = generateUUID();
+    // setUUID(newId);
+    // console.log('New UUID:', newId);
+    // setUUID(generateUUID());
+    // console.log('uuid', uuid);
   };
 
   const handleHistoryItemClick = async chatId => {
@@ -432,7 +478,6 @@ function Chat({navigation}) {
       if (selectedChatMessages.length > 0) {
         setUUID(chatId);
         setMessages(selectedChatMessages);
-        setHistoryVisible(false);
         setShowInput(true);
       } else {
         console.log('No messages found for this chatId.');
@@ -442,62 +487,7 @@ function Chat({navigation}) {
     }
   };
 
-  const formatDate = timestamp => {
-    const messageDate = new Date(Number(timestamp));
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
-
-    if (messageDate.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (messageDate.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else {
-      return messageDate.toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'short',
-      });
-    }
-  };
-  const handleHistory = async () => {
-    setDropdownVisible(false);
-
-    const storedMessages = await AsyncStorage.getItem('chatMessages');
-
-    let storedChatArray = storedMessages ? JSON.parse(storedMessages) : [];
-
-    if (storedChatArray.length === 0) {
-      Alert.alert(
-        'No Chat History',
-        'Your chat history is empty. Start a conversation now to see your history here!',
-      );
-      return;
-    }
-    setHistoryVisible(true);
-    const groupedChats = storedChatArray.reduce((acc, message) => {
-      const dateLabel = formatDate(message.id);
-
-      if (!message.chatId) {
-        // console.warn('chatId is undefined for message:', message);
-        return acc;
-      }
-
-      if (!acc[dateLabel]) {
-        acc[dateLabel] = {};
-      }
-
-      if (!acc[dateLabel][message.chatId]) {
-        acc[dateLabel][message.chatId] = {
-          firstMessage: message,
-          messages: [],
-        };
-      }
-
-      acc[dateLabel][message.chatId].messages.push(message);
-      return acc;
-    }, {});
-    setChatHistory(groupedChats);
-  };
+ 
   const handleChatClick = async () => {
     if (!chatText.trim()) return;
 
@@ -545,84 +535,22 @@ function Chat({navigation}) {
   };
 
   return (
-    <ScreenWrapper>
-      <View style={styles.userImageContainer}>
-        <TouchableOpacity
-          onPress={() => setDropdownVisible(!isDropdownVisible)}>
-          <Image
-            source={require('../../assets/Images/profile-user.png')}
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
-
-        <Modal
-          isVisible={isDropdownVisible}
-          onBackdropPress={() => setDropdownVisible(false)}
-          backdropOpacity={0}
-          style={styles.modal}>
-          <View style={styles.dropdown}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleNewChat}>
-              <Text style={styles.menuText}>New Chat</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setDropdownVisible(false);
-                navigation.navigate('Profile');
-              }}>
-              <Text style={styles.menuText}>Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={handleHistory}>
-              <Text style={styles.menuText}>History</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-
-        {/* Bottom Drawer (History) */}
-        <Modal
-          isVisible={isHistoryVisible}
-          onBackdropPress={() => setHistoryVisible(false)}
-          swipeDirection="down"
-          onSwipeComplete={() => setHistoryVisible(false)}
-          style={styles.bottomModal}>
-          <View style={styles.drawer}>
-            <FlatList
-              data={Object.entries(chatHistory).reverse()}
-              keyExtractor={(item, index) => index}
-              renderItem={({item}) => {
-                const [dateLabel, chats] = item;
-                return (
-                  <View>
-                    <Text style={styles.dateHeader}>{dateLabel}</Text>
-                    {Object.values(chats)
-                      .sort((a, b) => b.firstMessage.id - a.firstMessage.id)
-                      .map(chat => (
-                        <TouchableOpacity
-                          key={String(chat.chatId || Math.random())}
-                          onPress={() =>
-                            handleHistoryItemClick(chat.firstMessage.chatId)
-                          }
-                          style={styles.chatItem}>
-                          <View style={styles.icon}>
-                            <MicroPhoneIcon />
-                          </View>
-                          <Text style={styles.chatText} numberOfLines={1}>
-                            {chat.firstMessage.text}{' '}
-                          </Text>
-                          <SideArrowIcon />
-                        </TouchableOpacity>
-                      ))}
-                  </View>
-                );
-              }}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        </Modal>
-      </View>
-
+    <ScreenWrapper isSpecialBg={showInput}>
+      
       {!showInput && (
         <View style={styles.imageContainer}>
+          {!showInput && !showChatBubble && (
+            <Text style={styles.talkText}>
+              {isListening
+                ? 'Listening...'
+                : isResponding
+                ? 'Processing...'
+                : isSpeaking
+                ? 'Speaking...'
+                : 'Tap to Talk'}
+            </Text>
+          )}
+
           <TouchableOpacity
             onPress={() => {
               if (isButtonDisabled) {
@@ -645,46 +573,43 @@ function Chat({navigation}) {
               loop={!isButtonDisabled}
             />
           </TouchableOpacity>
-          {!showInput && !showChatBubble && (
-            <Text style={styles.talkText}>
-              {isListening
-                ? 'Listening...'
-                : isResponding
-                ? 'Processing...'
-                : isSpeaking
-                ? 'Speaking...'
-                : 'Tap to Talk'}
-            </Text>
-          )}
         </View>
       )}
 
       {showInput && messages.length > 0 && (
-        <View style={styles.chatContainer}>
-          <ScrollView
-            ref={scrollViewRef}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{flexGrow: 1}}
-            onContentSizeChange={() =>
-              scrollViewRef.current?.scrollToEnd({animated: true})
-            }>
-            {messages.map((msg, index) => (
-              <View
-                key={`${msg.sender}-${index}`}
-                style={[
-                  styles.messageBubble,
-                  msg.sender === 'user' ? styles.userMessage : styles.aiMessage,
-                ]}>
-                <Text
-                  style={
-                    msg.sender === 'user' ? styles.userText : styles.aiText
-                  }>
-                  {msg.text}
-                </Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
+        <LinearGradient
+          colors={['#DAD4FF', '#FFFFFF00']}
+          start={{x: 0.5, y: 0}}
+          end={{x: 0.5, y: 1}}
+          style={styles.chatContainer}>
+          <View style={styles.chatContainer}>
+            <ScrollView
+              ref={scrollViewRef}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{flexGrow: 1}}
+              onContentSizeChange={() =>
+                scrollViewRef.current?.scrollToEnd({animated: true})
+              }>
+              {messages.map((msg, index) => (
+                <View
+                  key={`${msg.sender}-${index}`}
+                  style={[
+                    styles.messageBubble,
+                    msg.sender === 'user'
+                      ? styles.userMessage
+                      : styles.aiMessage,
+                  ]}>
+                  <Text
+                    style={
+                      msg.sender === 'user' ? styles.userText : styles.aiText
+                    }>
+                    {msg.text}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </LinearGradient>
       )}
       <TouchableOpacity
         style={showInput ? styles.expandedContainer : styles.startChatContainer}
@@ -709,7 +634,7 @@ function Chat({navigation}) {
             </View>
             <View style={styles.gennieWrapper}>
               <Image
-                source={require('../../assets/Images/gennie.png')}
+                source={require('../../assets/Images/chatLogo.png')}
                 style={styles.gennieImage}
               />
             </View>
@@ -744,7 +669,7 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
     color: '#282828',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
     fontWeight: '400',
   },
   bottomModal: {
@@ -764,7 +689,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   chatItem: {
     flexDirection: 'row',
@@ -800,7 +725,6 @@ const styles = StyleSheet.create({
   chatContainer: {
     flex: 1,
     padding: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.56)',
     marginBottom: 60,
     marginTop: 20,
     borderTopLeftRadius: 12,
@@ -830,17 +754,17 @@ const styles = StyleSheet.create({
   userText: {
     fontSize: 13,
     color: '#282828',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
     fontWeight: '400',
   },
   aiText: {
     fontSize: 13,
     color: '#4A05AD',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
     fontWeight: '400',
   },
 
-  userImageContainer: {
+  addChatContainer: {
     paddingTop: 25,
     paddingRight: 10,
     display: 'flex',
@@ -854,30 +778,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  profileImage: {
+  addChatIcon: {
     width: 35,
     height: 35,
-    borderWidth: 2,
-    borderColor: Colors.white,
-    borderRadius: 60,
-    backgroundColor: '#D9D9D9',
+    borderWidth: 1,
+    borderColor: '#E2E2E2',
+    borderRadius: 50,
+    backgroundColor: Colors.white,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   talkText: {
     fontWeight: '400',
     fontSize: 21,
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.deepViolet,
+    fontFamily: FontFamily.SpaceGrotesk,
     textAlign: 'center',
     paddingTop: 10,
   },
   startChatContainer: {
-    backgroundColor: Colors.white,
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'absolute',
     bottom: 0,
     right: 0,
@@ -909,19 +829,25 @@ const styles = StyleSheet.create({
   shareIcon: {
     position: 'absolute',
     right: 10,
+    backgroundColor: Colors.white,
+    borderRadius: 8,
+    width: 28,
+    height: 28,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   inputStyle: {
     flex: 1,
     fontSize: 16,
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
     fontWeight: '400',
-    color: '#5A5A5A',
-    borderWidth: 1,
-    borderColor: Colors.white,
+    color: Colors.darkGray,
     borderRadius: 8,
-    backgroundColor: Colors.white,
+    backgroundColor: '#C6B0F942',
     paddingLeft: 14,
     paddingRight: 40,
+    paddingVertical: 15,
   },
   gennieWrapper: {
     backgroundColor: Colors.white,
@@ -935,3 +861,4 @@ const styles = StyleSheet.create({
 });
 
 export default Chat;
+

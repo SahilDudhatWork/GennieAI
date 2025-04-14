@@ -74,15 +74,7 @@ function CreatePassword({navigation}) {
           <BackButton />
         </View>
         <View style={styles.inputSeaction}>
-          <Text
-            style={{
-              fontFamily: FontFamily.TimeRoman,
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: '600',
-            }}>
-            New Password
-          </Text>
+          <Text style={styles.newPasswordText}>New Password</Text>
         </View>
 
         {/* Password */}
@@ -91,7 +83,7 @@ function CreatePassword({navigation}) {
           <TextInput
             style={styles.inputStyle}
             placeholder="Enter your new password"
-            placeholderTextColor={Colors.white}
+            placeholderTextColor={Colors.darkGray}
             secureTextEntry
             autoCapitalize="none"
             value={userData.newPassword}
@@ -108,7 +100,7 @@ function CreatePassword({navigation}) {
           <TextInput
             style={styles.inputStyle}
             placeholder="Enter your re-enter password"
-            placeholderTextColor={Colors.white}
+            placeholderTextColor={Colors.darkGray}
             secureTextEntry
             autoCapitalize="none"
             value={userData.reEnterPassword}
@@ -140,35 +132,41 @@ const styles = StyleSheet.create({
   inputSeaction: {
     paddingTop: 40,
   },
+  newPasswordText: {
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.deepViolet,
+    fontSize: 22,
+    fontWeight: '600',
+  },
   inputStyle: {
     fontSize: 14,
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     width: '100%',
     fontWeight: '400',
     borderWidth: 1,
-    borderColor: Colors.white,
+    borderColor: Colors.darkGray,
     borderRadius: 12,
     backgroundColor: '#FFFFFF59',
     paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingVertical: 15,
   },
   lableText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
     fontWeight: '400',
   },
   buttonText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   buttonNext: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     marginTop: 30,

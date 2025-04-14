@@ -5,36 +5,55 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
+require File.join(__dir__, '../node_modules/react-native-permissions/scripts/setup.rb')
+require File.join(__dir__, '../node_modules/react-native/scripts/react_native_pods.rb')
+
+# Use modular headers
+use_modular_headers!
+
+# Minimum platform version
 platform :ios, min_ios_version_supported
+
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+# Setup permissions
+setup_permissions([
+  'Microphone',
+  'SpeechRecognition',
+])
+
+# Enforce use_frameworks to support Swift-based pods like FirebaseAuth
+use_frameworks! :linkage => :static
 
 target 'GennieAI' do
   config = use_native_modules!
 
   use_react_native!(
     :path => config[:reactNativePath],
-    # An absolute path to your application root.
+    :hermes_enabled => false,
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # Firebase & Google Sign-In dependencies
+  pod 'Firebase/Auth'
+  pod 'Firebase/Core'
+  pod 'GoogleSignIn'
+
   target 'GennieAITests' do
     inherit! :complete
-    # Pods for testing
   end
 
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
-    react_native_post_install(
-      installer,
-      config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
-    )
+    react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
+
+    # Fix FirebaseAuth Swift header issues
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Enables Swift compatibility for all pods (needed for FirebaseAuth-Swift.h)
+        config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+        config.build_settings['SWIFT_VERSION'] = '5.0'
+      end
+    end
   end
 end

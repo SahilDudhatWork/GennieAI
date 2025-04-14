@@ -152,8 +152,8 @@ function OtpSent({navigation}) {
               styles.buttonNext,
               {
                 backgroundColor: otp.every(num => num !== '')
-                  ? Colors.white
-                  : Colors.lightGrey,
+                  ? Colors.deepViolet
+                  : Colors.liteViolet,
               },
             ]}
             disabled={!otp.every(num => num !== '')}
@@ -183,13 +183,13 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   otpText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.deepViolet,
     fontSize: 22,
     fontWeight: '600',
   },
   resendText: {
-    color: Colors.white,
+    color: Colors.darkGray,
     fontSize: 14,
   },
   resendContainer: {
@@ -212,18 +212,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     textAlign: 'center',
     fontSize: 18,
-    color: Colors.white,
-    borderColor: Colors.white,
+    color: Colors.darkGray,
+    borderColor: Colors.darkGray,
     backgroundColor: '#FFFFFF59',
   },
   buttonText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   buttonNext: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     padding: 12,

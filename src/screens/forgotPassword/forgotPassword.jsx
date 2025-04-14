@@ -61,15 +61,7 @@ function ForgetPassword({navigation}) {
           <BackButton />
         </View>
         <View style={styles.inputSeaction}>
-          <Text
-            style={{
-              fontFamily: FontFamily.TimeRoman,
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: '600',
-            }}>
-            Forgot Password
-          </Text>
+          <Text style={styles.forgotPasswordText}>Forgot Password</Text>
         </View>
 
         <View style={styles.inputSeaction}>
@@ -77,7 +69,7 @@ function ForgetPassword({navigation}) {
           <TextInput
             style={styles.inputStyle}
             placeholder="Enter your email"
-            placeholderTextColor={Colors.white}
+            placeholderTextColor={Colors.darkGray}
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
@@ -108,35 +100,41 @@ const styles = StyleSheet.create({
   inputSeaction: {
     paddingTop: 40,
   },
+  forgotPasswordText: {
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.deepViolet,
+    fontSize: 22,
+    fontWeight: '600',
+  },
   inputStyle: {
     fontSize: 14,
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     width: '100%',
     fontWeight: '400',
     borderWidth: 1,
-    borderColor: Colors.white,
+    borderColor: Colors.darkGray,
     borderRadius: 12,
     backgroundColor: '#FFFFFF59',
     paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingVertical: 15,
   },
   lableText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
     fontWeight: '400',
   },
   buttonText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   buttonNext: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     marginTop: 30,

@@ -22,6 +22,8 @@ import {
 } from '@react-native-google-signin/google-signin';
 import {DotIndicator} from 'react-native-indicators';
 import Config from '../../../config';
+import {EmailIcon, LockIcon} from '../../components/Icons';
+import { appleAuth } from "@invertase/react-native-apple-authentication";
 
 function Login({navigation}) {
   const [userData, setUserData] = useState({
@@ -47,7 +49,7 @@ function Login({navigation}) {
     const errors = {};
     setApiErrorMsg('');
 
-    if (!userData.email.trim()) {
+    if (!userData?.email?.trim()) {
       errors.email = 'Email is required.';
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,8 +58,8 @@ function Login({navigation}) {
         : 'Invalid email format.';
     }
 
-    if (userData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters.';
+    if (!userData?.password?.trim()) {
+      errors.password = 'Password is required.';
     } else {
       errors.password = '';
     }
@@ -77,7 +79,7 @@ function Login({navigation}) {
             'token',
             JSON.stringify(res?.data?.accessToken),
           );
-          navigation.navigate('Chat');
+          navigation.navigate('Main', {screen: 'Chat'});
         }
       })
       .catch(error => {
@@ -103,7 +105,6 @@ function Login({navigation}) {
         email: userInfo.data.user.email,
         loginType: 'Google',
       };
-      console.log('userData--=-=-=-', userData);
       setLoading(true);
       axios
         .post('/v1/user/auth/login', userData)
@@ -114,7 +115,7 @@ function Login({navigation}) {
               'token',
               JSON.stringify(res?.data?.accessToken),
             );
-            navigation.navigate('Chat');
+            navigation.navigate('Main', {screen: 'Chat'});
           }
         })
         .catch(error => {
@@ -135,6 +136,75 @@ function Login({navigation}) {
       }
     }
   };
+   // Apple Sign-In implementation
+    const handleAppleLogin = async () => {
+      // Check if Apple Authentication is available (iOS 13+)
+      if (!appleAuth.isSupported) {
+        Alert.alert(
+          "Error",
+          "Apple Sign In is only available on iOS 13 and above"
+        );
+        return;
+      }
+      try {
+        // Perform the apple sign-in request
+        const appleAuthRequestResponse = await appleAuth.performRequest({
+          requestedOperation: appleAuth.Operation.LOGIN,
+          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+        });
+  
+        // Get the credential state
+        const credentialState = await appleAuth.getCredentialStateForUser(
+          appleAuthRequestResponse.user
+        );
+  
+        if (credentialState === appleAuth.State.AUTHORIZED) {
+        
+          const { user, email, fullName } = appleAuthRequestResponse;
+          if (fullName) {
+            const displayName = `${fullName.givenName} ${fullName.familyName}`;
+            const emailData = `${fullName.givenName}${fullName.familyName}@gmail.com`;
+            const userData = {
+              fullName: displayName,
+              email: emailData,
+              loginType: 'Apple',
+            };
+
+            setLoading(true);
+            axios
+              .post('/v1/user/auth/login', userData)
+              .then(async res => {
+                console.log('res', res.data);
+                if (res?.data?.accessToken) {
+                  await AsyncStorage.setItem(
+                    'token',
+                    JSON.stringify(res?.data?.accessToken),
+                  );
+                  await AsyncStorage.setItem(
+                    'appleUserId',
+                    JSON.stringify(user),
+                  );
+                  navigation.navigate('Main', {screen: 'Chat'});
+                }
+              })
+              .catch(error => {
+                console.log(error?.request, 'error?.request');
+              })
+              .finally(() => setLoading(false));
+          }
+        } else {
+          Alert.alert("Error", "Apple Sign In failed");
+        }
+      } catch (error) {
+        if (error.code === appleAuth.Error.CANCELED) {
+          console.log('User cancelled Apple Sign-In');
+        } else {
+          console.error('Apple Sign-In Error:', error);
+        }
+        console.log("Error during Apple sign in:", error);
+        Alert.alert("Error", "Something went wrong with Apple Sign-In");
+      }
+    };
 
   return (
     <>
@@ -158,14 +228,19 @@ function Login({navigation}) {
             <View>
               <View style={styles.inputSeaction}>
                 <Text style={styles.lableText}>Email</Text>
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Enter your email"
-                  placeholderTextColor={Colors.white}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  onChangeText={text => setUserData({...userData, email: text})}
-                />
+                <View style={styles.inputWrapper}>
+                  <EmailIcon style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Enter your email"
+                    placeholderTextColor={Colors.darkGray}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    onChangeText={text =>
+                      setUserData({...userData, email: text})
+                    }
+                  />
+                </View>
               </View>
               {validationErrors?.email && (
                 <Text style={styles.errorText}>{validationErrors?.email}</Text>
@@ -176,16 +251,19 @@ function Login({navigation}) {
               {/* Password */}
               <View style={{paddingTop: 10}}>
                 <Text style={styles.lableText}>Password</Text>
-                <TextInput
-                  style={styles.inputStyle}
-                  placeholder="Enter your password"
-                  placeholderTextColor={Colors.white}
-                  secureTextEntry
-                  autoCapitalize="none"
-                  onChangeText={text =>
-                    setUserData({...userData, password: text})
-                  }
-                />
+                <View style={styles.inputWrapper}>
+                  <LockIcon style={styles.iconStyle} />
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder="Enter your password"
+                    placeholderTextColor={Colors.darkGray}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    onChangeText={text =>
+                      setUserData({...userData, password: text})
+                    }
+                  />
+                </View>
               </View>
               {validationErrors?.password && (
                 <Text style={styles.errorText}>
@@ -202,21 +280,21 @@ function Login({navigation}) {
                 </Text>
               </View>
 
-              <View>
+              
                 <TouchableOpacity
                   style={styles.buttonLogin}
                   onPress={handleLogin}>
                   <Text style={styles.buttonLoginText}>Login</Text>
                 </TouchableOpacity>
-              </View>
+              
 
               <View style={styles.orSignContainer}>
                 <View
-                  style={{flex: 1, height: 1, backgroundColor: Colors.white}}
+                  style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
                 />
                 <Text style={styles.orSignText}>Or sign in with</Text>
                 <View
-                  style={{flex: 1, height: 1, backgroundColor: Colors.white}}
+                  style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
                 />
               </View>
               <View style={styles.signupOr}>
@@ -228,7 +306,7 @@ function Login({navigation}) {
                 </TouchableOpacity>
 
                 {Platform.OS === 'ios' && (
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleAppleLogin}>
                     <Image
                       source={require('../../assets/Images/auth/apple.png')}
                       style={{width: 40, height: 40}}
@@ -237,11 +315,14 @@ function Login({navigation}) {
                 )}
               </View>
             </View>
-            <View style={{position: 'absolute', bottom: 0, width: '100%'}}>
+            <View style={{position: 'absolute', bottom: 50, width: '100%'}}>
               <Text style={styles.accountText}>
                 Don’t have an account?{' '}
                 <Text
-                  style={{textDecorationLine: 'underline'}}
+                  style={{
+                    textDecorationLine: 'underline',
+                    color: Colors.deepViolet,
+                  }}
                   onPress={() => {
                     navigation.navigate('Signup');
                   }}>
@@ -254,7 +335,7 @@ function Login({navigation}) {
       </ScreenWrapper>
       {loading && (
         <View style={styles.loadingOverlay}>
-          <DotIndicator color="white" size={15} />
+          <DotIndicator color="#4A05AD" size={15} />
         </View>
       )}
     </>
@@ -264,6 +345,7 @@ function Login({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   loadingOverlay: {
     position: 'absolute',
@@ -277,27 +359,27 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   buttonLoginText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   buttonLogin: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     marginTop: 30,
     padding: 12,
   },
   loginTitleText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.deepViolet,
     fontSize: 22,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   welcomeBackText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 13,
     paddingTop: 5,
     fontWeight: '400',
@@ -305,25 +387,25 @@ const styles = StyleSheet.create({
   accountText: {
     fontSize: 16,
     fontWeight: '400',
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     textAlign: 'center',
   },
   forgotPasswordText: {
     fontSize: 12,
     fontWeight: '400',
     paddingTop: 10,
-    color: Colors.white,
+    color: Colors.darkGray,
     textAlign: 'right',
     paddingHorizontal: 5,
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
     textDecorationLine: 'underline',
   },
   orSignText: {
     fontSize: 12,
     fontWeight: '400',
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
     paddingHorizontal: 30,
   },
   orSignContainer: {
@@ -331,22 +413,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 40,
   },
-  inputStyle: {
-    fontSize: 14,
-    color: Colors.white,
-    fontFamily: FontFamily.TimeRoman,
-    width: '100%',
-    fontWeight: '400',
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.white,
+    borderColor: Colors.darkGray,
     borderRadius: 12,
     backgroundColor: '#FFFFFF59',
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingHorizontal: 10,
+  },
+
+  iconStyle: {
+    marginRight: 10,
+  },
+  inputStyle: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
+    width: '100%',
+    fontWeight: '400',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
   },
   lableText: {
-    fontFamily: FontFamily.TimeRoman,
-    color: Colors.white,
+    fontFamily: FontFamily.SpaceGrotesk,
+    color: Colors.darkGray,
     fontSize: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -369,3 +461,4 @@ const styles = StyleSheet.create({
   },
 });
 export default Login;
+

@@ -17,16 +17,19 @@ function Splash({navigation}) {
   const translateYAnim = useRef(new Animated.Value(0)).current;
   const [isContentShow, setIsContentShow] = useState(false);
   const Width = Dimensions.get('window').height;
-  console.log('Width-------', Width);
   const getStarted = async () => {
     const token = await AsyncStorage.getItem('token');
     if (!token) {
-      navigation.navigate('Login');
+      navigation.navigate('Onboarding');
     } else {
-      navigation.navigate('Chat');
+      navigation.navigate('Main', {screen: 'Chat'});
     }
   };
-  useEffect(() => {
+  useEffect(async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      navigation.navigate('Main', {screen: 'Chat'});
+    }
     setTimeout(() => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -107,31 +110,31 @@ const styles = StyleSheet.create({
     height: 326,
   },
   buttonGetStarted: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
     marginTop: 20,
     padding: 12,
   },
   buttonGetStartedText: {
-    color: '#4A05AD',
+    color: Colors.white,
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: FontFamily.TimeRoman,
+    fontFamily: FontFamily.SpaceGrotesk,
   },
   buttonSignIn: {
-    backgroundColor: '#FFFFFF00',
     borderRadius: 22,
     width: '100%',
     marginTop: 20,
     padding: 12,
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.deepViolet,
   },
   buttonSignInText: {
-    color: Colors.white,
+    color: Colors.deepViolet,
     fontSize: 16,
     textAlign: 'center',
+    fontFamily: FontFamily.SpaceGrotesk,
   },
 });
 
