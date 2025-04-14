@@ -38,7 +38,6 @@ function ForgetPassword({navigation}) {
     axios
       .post('/v1/common/otp/sent/user', {email: email})
       .then(async res => {
-        console.log('res', res);
         await AsyncStorage.setItem('otpEmail', JSON.stringify(email));
         navigation.navigate('OtpSent');
       })

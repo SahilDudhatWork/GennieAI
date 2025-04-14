@@ -1,5 +1,11 @@
 import React from 'react';
-import {ImageBackground, StyleSheet, View,Platform, StatusBar} from 'react-native';
+import {
+  ImageBackground,
+  StyleSheet,
+  View,
+  Platform,
+  StatusBar,
+} from 'react-native';
 
 const ScreenWrapper = ({children, isSpecialBg, style}) => {
   return (
@@ -9,7 +15,11 @@ const ScreenWrapper = ({children, isSpecialBg, style}) => {
           ? require('../assets/Images/new_splash_screen.png')
           : require('../assets/Images/splash_screen.png')
       }
-      style={[styles.background, style,{paddingTop: Platform.OS === "ios" ? StatusBar.currentHeight : 0}]}>
+      style={[
+        styles.background,
+        style,
+        {paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : ''},
+      ]}>
       <View style={styles.overlay}>{children}</View>
     </ImageBackground>
   );
@@ -23,8 +33,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    paddingTop: 10,
-    paddingTop:Platform.OS ==='ios' ? 50 : 10,
+    paddingTop: Platform.OS === 'ios' ? 50 : 10,
   },
 });
 

@@ -10,8 +10,6 @@ import SelectLanguage from './src/screens/selectLanguage/selectLanguage';
 import ForgotPassword from './src/screens/forgotPassword/forgotPassword';
 import OtpSent from './src/screens/otpSent/otpSent';
 import CreatePassword from './src/screens/createPassword/createPassword';
-import Profile from './src/screens/profile/profile';
-import Chat from './src/screens/chat/chat';
 import Onboarding from './src/screens/onboarding/onboarding';
 import BottomTabs from './src/navigation/BottomTabs';
 
@@ -23,7 +21,7 @@ function App() {
       {/* Wrap the app in SafeAreaProvider */}
       <StatusBar
         barStyle="light-content" // Change status bar style to light (optional)
-        // translucent={true} // Make the status bar transparent
+        translucent={true} // Make the status bar transparent
         backgroundColor="transparent" // Set background to transparent
       />
       <NavigationContainer>
@@ -61,16 +59,6 @@ function App() {
             component={CreatePassword}
             options={{headerShown: false}}
           />
-          {/* <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={{headerShown: false}}
-          /> */}
-          {/* <Stack.Screen
-            name="Chat"
-            component={Chat}
-            options={{headerShown: false}}
-          /> */}
           <Stack.Screen
             name="Onboarding"
             component={Onboarding}

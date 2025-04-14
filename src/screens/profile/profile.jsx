@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import {
-  Dimensions,
   StyleSheet,
   Text,
   TextInput,
@@ -10,16 +9,15 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import {LogOutIcon, ProfileEditIcon} from '../../components/Icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from '../../../axios';
 import {DotIndicator} from 'react-native-indicators';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 function UpdateProfile({navigation}) {
-  const Height = Dimensions.get('window').height;
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
     fullName: '',
@@ -48,6 +46,15 @@ function UpdateProfile({navigation}) {
       }
     }, [route.params]),
   );
+
+  const handleImagePick = () => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
+      if (!response.didCancel && !response.error) {
+        console.log('image selected ', response.assets[0].uri);
+      }
+    });
+  };
+
   const fetchData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -65,7 +72,6 @@ function UpdateProfile({navigation}) {
         axios
           .get('/v1/user/profile')
           .then(async res => {
-            console.log('res---', res.data?.mobile);
             setUserData({
               ...res.data,
               mobile: res.data?.mobile?.toString(),
@@ -109,7 +115,6 @@ function UpdateProfile({navigation}) {
     axios
       .put('/v1/user/profile', userData)
       .then(async res => {
-        console.log('res', res);
         setUserDisplayData(userData);
         await AsyncStorage.setItem('userData', JSON.stringify(userData));
       })
@@ -133,19 +138,17 @@ function UpdateProfile({navigation}) {
           style={styles.container}
           showsVerticalScrollIndicator={false}>
           <View>
-            <View>
-              <BackButton />
-            </View>
-
             <View style={styles.profileImageContainer}>
               <View style={{position: 'relative'}}>
                 <Image
                   source={require('../../assets/Images/profile-user.png')}
                   style={styles.profileImage}
                 />
-                <View style={styles.profileEditIcon}>
+                <TouchableOpacity
+                  style={styles.profileEditIcon}
+                  onPress={handleImagePick}>
                   <ProfileEditIcon />
-                </View>
+                </TouchableOpacity>
               </View>
               <View>
                 <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
@@ -243,7 +246,7 @@ function UpdateProfile({navigation}) {
       </ScreenWrapper>
       {loading && (
         <View style={styles.loadingOverlay}>
-          <DotIndicator color="#4A05AD" size={15} />
+          <DotIndicator color="#4A05ADCC" size={15} />
         </View>
       )}
     </>

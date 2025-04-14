@@ -16,7 +16,6 @@ function Splash({navigation}) {
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
   const translateYAnim = useRef(new Animated.Value(0)).current;
   const [isContentShow, setIsContentShow] = useState(false);
-  const Width = Dimensions.get('window').height;
   const getStarted = async () => {
     const token = await AsyncStorage.getItem('token');
     if (!token) {

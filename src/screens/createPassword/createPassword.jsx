@@ -60,7 +60,6 @@ function CreatePassword({navigation}) {
         newPassword: userData.newPassword,
       })
       .then(async res => {
-        console.log('res', res);
         navigation.navigate('Login');
       })
       .catch(error => {

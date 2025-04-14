@@ -53,16 +53,13 @@ function OtpSent({navigation}) {
     let otpEmailStr = await AsyncStorage.getItem('otpEmail');
     setApiErrorMsg('');
 
-    console.log('otpEmailStr', otpEmailStr);
     if (!otpEmailStr) {
       return;
     }
     let otpEmail = JSON.parse(otpEmailStr);
-    console.log('otpEmail', otpEmail);
     axios
       .post('/v1/common/otp/sent/user', {email: otpEmail})
       .then(async res => {
-        console.log('res', res);
         setOtp(['', '', '', '', '', '']);
         setTimer(300);
       })
@@ -98,7 +95,6 @@ function OtpSent({navigation}) {
       })
       .catch(error => {
         console.log(error?.request);
-
         if (error?.request?._response) {
           let errData = error?.request?._response;
           let apiError = JSON.parse(errData)?.msg;

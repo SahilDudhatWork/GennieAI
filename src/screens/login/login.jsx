@@ -23,7 +23,7 @@ import {
 import {DotIndicator} from 'react-native-indicators';
 import Config from '../../../config';
 import {EmailIcon, LockIcon} from '../../components/Icons';
-import { appleAuth } from "@invertase/react-native-apple-authentication";
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 
 function Login({navigation}) {
   const [userData, setUserData] = useState({
@@ -73,7 +73,6 @@ function Login({navigation}) {
     axios
       .post('/v1/user/auth/login', userData)
       .then(async res => {
-        console.log('res', res.data);
         if (res?.data?.accessToken) {
           await AsyncStorage.setItem(
             'token',
@@ -109,7 +108,6 @@ function Login({navigation}) {
       axios
         .post('/v1/user/auth/login', userData)
         .then(async res => {
-          console.log('res', res.data);
           if (res?.data?.accessToken) {
             await AsyncStorage.setItem(
               'token',
@@ -136,75 +134,70 @@ function Login({navigation}) {
       }
     }
   };
-   // Apple Sign-In implementation
-    const handleAppleLogin = async () => {
-      // Check if Apple Authentication is available (iOS 13+)
-      if (!appleAuth.isSupported) {
-        Alert.alert(
-          "Error",
-          "Apple Sign In is only available on iOS 13 and above"
-        );
-        return;
-      }
-      try {
-        // Perform the apple sign-in request
-        const appleAuthRequestResponse = await appleAuth.performRequest({
-          requestedOperation: appleAuth.Operation.LOGIN,
-          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-        });
-  
-        // Get the credential state
-        const credentialState = await appleAuth.getCredentialStateForUser(
-          appleAuthRequestResponse.user
-        );
-  
-        if (credentialState === appleAuth.State.AUTHORIZED) {
-        
-          const { user, email, fullName } = appleAuthRequestResponse;
-          if (fullName) {
-            const displayName = `${fullName.givenName} ${fullName.familyName}`;
-            const emailData = `${fullName.givenName}${fullName.familyName}@gmail.com`;
-            const userData = {
-              fullName: displayName,
-              email: emailData,
-              loginType: 'Apple',
-            };
+  // Apple Sign-In implementation
+  const handleAppleLogin = async () => {
+    // Check if Apple Authentication is available (iOS 13+)
+    if (!appleAuth.isSupported) {
+      Alert.alert(
+        'Error',
+        'Apple Sign In is only available on iOS 13 and above',
+      );
+      return;
+    }
+    try {
+      // Perform the apple sign-in request
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
 
-            setLoading(true);
-            axios
-              .post('/v1/user/auth/login', userData)
-              .then(async res => {
-                console.log('res', res.data);
-                if (res?.data?.accessToken) {
-                  await AsyncStorage.setItem(
-                    'token',
-                    JSON.stringify(res?.data?.accessToken),
-                  );
-                  await AsyncStorage.setItem(
-                    'appleUserId',
-                    JSON.stringify(user),
-                  );
-                  navigation.navigate('Main', {screen: 'Chat'});
-                }
-              })
-              .catch(error => {
-                console.log(error?.request, 'error?.request');
-              })
-              .finally(() => setLoading(false));
-          }
-        } else {
-          Alert.alert("Error", "Apple Sign In failed");
+      // Get the credential state
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        const {user, email, fullName} = appleAuthRequestResponse;
+        if (fullName) {
+          const displayName = `${fullName.givenName} ${fullName.familyName}`;
+          const emailData = `${fullName.givenName}${fullName.familyName}@gmail.com`;
+          const userData = {
+            fullName: displayName,
+            email: emailData,
+            loginType: 'Apple',
+          };
+
+          setLoading(true);
+          axios
+            .post('/v1/user/auth/login', userData)
+            .then(async res => {
+              if (res?.data?.accessToken) {
+                await AsyncStorage.setItem(
+                  'token',
+                  JSON.stringify(res?.data?.accessToken),
+                );
+                await AsyncStorage.setItem('appleUserId', JSON.stringify(user));
+                navigation.navigate('Main', {screen: 'Chat'});
+              }
+            })
+            .catch(error => {
+              console.log(error?.request, 'error?.request');
+            })
+            .finally(() => setLoading(false));
         }
-      } catch (error) {
-        if (error.code === appleAuth.Error.CANCELED) {
-          console.log('User cancelled Apple Sign-In');
-        } else {
-          console.error('Apple Sign-In Error:', error);
-        }
-        console.log("Error during Apple sign in:", error);
-        Alert.alert("Error", "Something went wrong with Apple Sign-In");
+      } else {
+        Alert.alert('Error', 'Apple Sign In failed');
       }
-    };
+    } catch (error) {
+      if (error.code === appleAuth.Error.CANCELED) {
+        console.log('User cancelled Apple Sign-In');
+      } else {
+        console.error('Apple Sign-In Error:', error);
+      }
+      console.log('Error during Apple sign in:', error);
+      Alert.alert('Error', 'Something went wrong with Apple Sign-In');
+    }
+  };
 
   return (
     <>
@@ -280,13 +273,11 @@ function Login({navigation}) {
                 </Text>
               </View>
 
-              
-                <TouchableOpacity
-                  style={styles.buttonLogin}
-                  onPress={handleLogin}>
-                  <Text style={styles.buttonLoginText}>Login</Text>
-                </TouchableOpacity>
-              
+              <TouchableOpacity
+                style={styles.buttonLogin}
+                onPress={handleLogin}>
+                <Text style={styles.buttonLoginText}>Login</Text>
+              </TouchableOpacity>
 
               <View style={styles.orSignContainer}>
                 <View
@@ -315,7 +306,12 @@ function Login({navigation}) {
                 )}
               </View>
             </View>
-            <View style={{position: 'absolute', bottom: 50, width: '100%'}}>
+            <View
+              style={{
+                position: 'absolute',
+                bottom: Platform.OS === 'ios' ? 50 : 0,
+                width: '100%',
+              }}>
               <Text style={styles.accountText}>
                 Don’t have an account?{' '}
                 <Text
@@ -335,7 +331,7 @@ function Login({navigation}) {
       </ScreenWrapper>
       {loading && (
         <View style={styles.loadingOverlay}>
-          <DotIndicator color="#4A05AD" size={15} />
+          <DotIndicator color="#4A05ADCC" size={15} />
         </View>
       )}
     </>
@@ -345,7 +341,6 @@ function Login({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    
   },
   loadingOverlay: {
     position: 'absolute',
@@ -461,4 +456,3 @@ const styles = StyleSheet.create({
   },
 });
 export default Login;
-

@@ -4,6 +4,7 @@ import {StyleSheet, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import {
   AddChatIcon,
+  MessageIcon,
   MicroPhoneIcon,
   SideArrowIcon,
 } from '../../components/Icons';
@@ -98,7 +99,12 @@ function ChatHistory({navigation}) {
           <Text style={styles.historyText}>History</Text>
           <TouchableOpacity
             style={styles.addChatIcon}
-            onPress={() => navigation.navigate('Main', {screen: 'Chat'})}>
+            onPress={() =>
+              navigation.navigate('Main', {
+                screen: 'Chat',
+                params: {startNewChat: true},
+              })
+            }>
             <AddChatIcon />
           </TouchableOpacity>
         </View>
@@ -109,43 +115,55 @@ function ChatHistory({navigation}) {
           blurAmount={10}
           reducedTransparencyFallbackColor="white">
           <View style={styles.drawer}>
-            <FlatList
-              data={Object.entries(chatHistory).reverse()}
-              keyExtractor={(item, index) => index}
-              renderItem={({item}) => {
-                const [dateLabel, chats] = item;
-                return (
-                  <View>
-                    <Text style={styles.dateHeader}>{dateLabel}</Text>
-                    {Object.values(chats)
-                      .sort((a, b) => b.firstMessage.id - a.firstMessage.id)
-                      .map(chat => (
-                        <TouchableOpacity
-                          key={String(chat.chatId || Math.random())}
-                          onPress={() =>
-                            navigation.navigate('Main', {
-                              screen: 'Chat',
-                              params: {
-                                fromHistory: true,
-                                chatId: chat.firstMessage.chatId,
-                              },
-                            })
-                          }
-                          style={styles.chatItem}>
-                          <View style={styles.microPhoneIcon}>
-                            <MicroPhoneIcon />
-                          </View>
-                          <Text style={styles.chatText} numberOfLines={1}>
-                            {chat.firstMessage.text}{' '}
-                          </Text>
-                          <SideArrowIcon />
-                        </TouchableOpacity>
-                      ))}
-                  </View>
-                );
-              }}
-              showsVerticalScrollIndicator={false}
-            />
+            {Object.keys(chatHistory).length === 0 ? (
+              <View style={styles.noHistoryContainer}>
+                <Text style={styles.noHistoryText}>No chat history found</Text>
+              </View>
+            ) : (
+              <FlatList
+                data={Object.entries(chatHistory).reverse()}
+                keyExtractor={(item, index) => index}
+                renderItem={({item}) => {
+                  const [dateLabel, chats] = item;
+                  return (
+                    <View>
+                      <Text style={styles.dateHeader}>{dateLabel}</Text>
+                      {Object.values(chats)
+                        .sort((a, b) => b.firstMessage.id - a.firstMessage.id)
+                        .map(chat => (
+                          <TouchableOpacity
+                            key={String(chat.chatId || Math.random())}
+                            onPress={() =>
+                              navigation.navigate('Main', {
+                                screen: 'Chat',
+                                params: {
+                                  fromHistory: true,
+                                  chatId: chat.firstMessage.chatId,
+                                },
+                              })
+                            }
+                            style={styles.chatItem}>
+                            {chat.firstMessage.type === 'speak' ? (
+                              <View style={styles.microPhoneIcon}>
+                                <MicroPhoneIcon />
+                              </View>
+                            ) : (
+                              <View style={styles.chatIcon}>
+                                <MessageIcon />
+                              </View>
+                            )}
+                            <Text style={styles.chatText} numberOfLines={1}>
+                              {chat.firstMessage.text}{' '}
+                            </Text>
+                            <SideArrowIcon />
+                          </TouchableOpacity>
+                        ))}
+                    </View>
+                  );
+                }}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
           </View>
         </BlurView>
       </View>
@@ -174,9 +192,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  noHistoryContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+
+  noHistoryText: {
+    fontSize: 16,
+    color: Colors.darkGray,
+  },
+
   addChatContainer: {
     flexDirection: 'row',
-    paddingTop: 25,
+    paddingTop: 20,
     paddingHorizontal: 20,
     justifyContent: 'space-between',
   },

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
-  StatusBar,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Animatable from 'react-native-animatable';
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     position: 'relative',
-    paddingTop:Platform.OS ==='ios' ? 50 : '',
+    paddingTop: Platform.OS === 'ios' ? 50 : '',
   },
   layerImage: {
     position: 'absolute',
@@ -200,13 +199,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 10,
-    zIndex:99,
   },
   skipText: {
-    color: Colors.deepViolet,
+    color: Colors.white,
     fontSize: 16,
     fontWeight: '700',
-    fontFamily: FontFamily.SpaceGrotesk,
+    fontFamily: FontFamily.TimeRoman,
   },
   centerWrapper: {
     alignItems: 'center',
@@ -243,8 +241,7 @@ const styles = StyleSheet.create({
     fontSize: 35,
     color: Colors.deepViolet,
     fontWeight: '400',
-    fontFamily: FontFamily.SpaceGrotesk,
-    letterSpacing: -2,
+    fontFamily: FontFamily.TimeRoman,
     textAlign: 'center',
     marginTop: height * 0.07,
     marginBottom: 15,
@@ -256,7 +253,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     paddingHorizontal: 30,
     lineHeight: 20,
-    fontFamily: FontFamily.SpaceGrotesk,
+    fontFamily: FontFamily.TimeRoman,
   },
 });
 

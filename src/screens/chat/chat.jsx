@@ -10,7 +10,6 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
-  FlatList,
 } from 'react-native';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import {Colors, FontFamily} from '../../../Utils/Themes';
@@ -19,8 +18,8 @@ import {
   ShareIcon,
   SideArrowIcon,
   MicroPhoneIcon,
+  AddChatIcon,
 } from '../../components/Icons';
-import Modal from 'react-native-modal';
 
 import Voice from '@react-native-voice/voice';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
@@ -32,15 +31,13 @@ import Config from '../../../config';
 import LottieView from 'lottie-react-native';
 import {LinearGradient} from 'react-native-linear-gradient';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
+
 function Chat({navigation}) {
   const [showInput, setShowInput] = useState(false);
   const [showChatBubble, setShowChatBubble] = useState(false);
   const [chatText, setChatText] = useState('');
   const [messages, setMessages] = useState([]);
   const scrollViewRef = useRef(null);
-  const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [isHistoryVisible, setHistoryVisible] = useState(false);
-  const [chatHistory, setChatHistory] = useState([]);
 
   //  chat -----------------
   const [isListening, setIsListening] = useState(false);
@@ -49,6 +46,7 @@ function Chat({navigation}) {
   const [retryCount, setRetryCount] = useState(0);
   const [currentChat, setCurrentChat] = useState(null);
   const [uuid, setUUID] = useState(null);
+  const uuidRef = useRef('');
   const route = useRoute();
 
   useFocusEffect(
@@ -89,17 +87,14 @@ function Chat({navigation}) {
     // Tts.setDefaultPitch(1.1); // Slightly raise pitch for a natural tone
 
     const handleTtsStart = () => {
-      console.log('TTS started');
       setIsSpeaking(true);
     };
 
     const handleTtsFinish = () => {
-      console.log('TTS finished');
       setIsSpeaking(false);
     };
 
     const handleTtsCancel = () => {
-      console.log('TTS canceled');
       setIsSpeaking(false);
     };
 
@@ -119,13 +114,16 @@ function Chat({navigation}) {
   }, []);
 
   useEffect(() => {
-    setUUID(generateUUID());
+    const newId = generateUUID();
+    setUUID(newId);
+    uuidRef.current = newId;
     const setupVoiceListeners = () => {
-    Voice.onSpeechStart = onSpeechStart;
-    Voice.onSpeechRecognized = onSpeechRecognized;
-    Voice.onSpeechEnd = onSpeechEnd;
-    Voice.onSpeechError = onSpeechError;
-    Voice.onSpeechResults = onSpeechResults;
+      Voice.onSpeechStart = onSpeechStart;
+      Voice.onSpeechRecognized = onSpeechRecognized;
+      Voice.onSpeechEnd = onSpeechEnd;
+      Voice.onSpeechError = onSpeechError;
+      Voice.onSpeechResults =
+        Platform.OS === 'ios' ? onSpeechResultsIOS : onSpeechResults;
     };
 
     setupVoiceListeners();
@@ -184,7 +182,6 @@ function Chat({navigation}) {
   };
 
   const onSpeechEnd = () => {
-    console.log('Speech ended');
     setIsListening(false);
   };
 
@@ -229,41 +226,48 @@ function Chat({navigation}) {
   const endTimeoutRef = useRef(null);
   const isRespondingRef = useRef(false);
   const speechProcessedRef = useRef(false);
-  
+
   useEffect(() => {
     isRespondingRef.current = isResponding;
   }, [isResponding]);
-  
 
-  const onSpeechResults = useCallback((e) => {
+  const onSpeechResultsIOS = useCallback(e => {
     const transcript = e.value?.[0];
-    console.log('Speech results:', transcript);
-  
-    if (!transcript || isRespondingRef.current || speechProcessedRef.current) return;
-  
+
+    if (!transcript || isRespondingRef.current || speechProcessedRef.current)
+      return;
+
     // Clear any existing timeout
     if (endTimeoutRef.current) {
       clearTimeout(endTimeoutRef.current);
     }
-  
+
     // Debounce + lock logic
     endTimeoutRef.current = setTimeout(() => {
       if (isRespondingRef.current || speechProcessedRef.current) {
-        console.log('Skipping due to active response or already processed speech');
         return;
       }
-  
-      console.log('Simulated speech end', transcript);
+
       setIsListening(false);
       speechProcessedRef.current = true;
       getAIResponse(transcript);
     }, 1200);
   }, []);
-  
-  
-  
-  
-  
+
+  const onSpeechResults = useCallback(
+    async e => {
+      setIsListening(false);
+      if (e.value && e.value.length > 0) {
+        const recognizedText = e.value[0];
+        if (!currentChat) {
+          await loadCurrentChat();
+        }
+
+        getAIResponse(recognizedText);
+      }
+    },
+    [currentChat],
+  );
 
   const requestMicrophonePermission = async () => {
     if (Platform.OS === 'android') {
@@ -285,63 +289,73 @@ function Chat({navigation}) {
       return false;
     }
   };
-  const getAIResponse = async (userQuery) => {
+  const getAIResponse = async userQuery => {
     try {
-      isRespondingRef.current = true;
-      speechProcessedRef.current = true;
+      if (Platform.OS === 'ios') {
+        isRespondingRef.current = true;
+        speechProcessedRef.current = true;
+        await Voice.stop();
+      }
       setIsResponding(true);
       setIsListening(false);
-      await Voice.stop();
-  
-      console.log('userQuery', userQuery);
-  
+      const currentChatId = uuidRef.current;
+
       const newUserMessage = {
         id: Date.now().toString(),
-        chatId: uuid,
+        chatId: currentChatId,
         text: userQuery,
         sender: 'user',
+        type: 'speak',
       };
-  
+
       const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
+        'http://103.168.18.197:8000/gennie/v1/api/text',
         {
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: userQuery }],
+          user_id: '8d02b643-b8a3-40bf-9f55-82a52a0fd71e',
+          session_id: 'e211ab67-9e6d-445f-afc5-7b0d6175abc1',
+          stream: false,
+          text: userQuery,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-        }
       );
-  
-      const aiResponse = response.data.choices[0].message.content.trim();
-      console.log('response.data', response.data);
-  
+      // const response = await axios.post(
+      //   'https://api.openai.com/v1/chat/completions',
+      //   {
+      //     model: 'gpt-3.5-turbo',
+      //     messages: [{role: 'user', content: userQuery}],
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
+      //       'Content-Type': 'application/json',
+      //     },
+      //   },
+      // );
+
+      // const aiResponse = response.data.choices[0].message.content.trim();
+      const aiResponse = response.data.response_text;
+
       const newBotMessage = {
         id: (Date.now() + 1).toString(),
-        chatId: uuid,
+        chatId: currentChatId,
         text: aiResponse,
         sender: 'ai',
       };
-  
+
       await saveMessagesToStorage([newUserMessage, newBotMessage]);
+      setIsResponding(false);
       speakResponse(aiResponse);
-  
+
       return aiResponse;
     } catch (error) {
-      console.error('Error fetching AI response:', error);
+      console.error('Error fetching AI response:', error.request);
       Alert.alert('Error', 'Failed to get response. Try again.');
       return null;
     } finally {
       isRespondingRef.current = false;
-      speechProcessedRef.current = false; // reset for next input
+      speechProcessedRef.current = false;
       setIsResponding(false);
     }
   };
-  
-  
 
   const speakResponse = text => {
     if (!text) return;
@@ -371,7 +385,8 @@ function Chat({navigation}) {
       Voice.onSpeechRecognized = onSpeechRecognized;
       Voice.onSpeechEnd = onSpeechEnd;
       Voice.onSpeechError = onSpeechError;
-      Voice.onSpeechResults = onSpeechResults;
+      Voice.onSpeechResults =
+        Platform.OS === 'ios' ? onSpeechResultsIOS : onSpeechResults;
 
       await loadCurrentChat();
 
@@ -431,6 +446,15 @@ function Chat({navigation}) {
       handleHistoryItemClick(route.params.chatId);
     }
   }, [route.params]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.startNewChat) {
+        handleNewChat();
+      }
+    }, [route.params]),
+  );
+
   const saveMessagesToStorage = async newMessages => {
     try {
       const storedMessages = await AsyncStorage.getItem('chatMessages');
@@ -444,18 +468,15 @@ function Chat({navigation}) {
       console.log(' Error storing messages:', error);
     }
   };
+
   const handleNewChat = async () => {
     const newId = generateUUID();
     setUUID(newId);
-    console.log('New UUID:', newId);
-    setDropdownVisible(false);
+    uuidRef.current = newId;
     setMessages([]);
     setShowInput(false);
-    // const newId = generateUUID();
-    // setUUID(newId);
-    // console.log('New UUID:', newId);
-    // setUUID(generateUUID());
-    // console.log('uuid', uuid);
+    setChatText('');
+    return newId;
   };
 
   const handleHistoryItemClick = async chatId => {
@@ -477,6 +498,7 @@ function Chat({navigation}) {
 
       if (selectedChatMessages.length > 0) {
         setUUID(chatId);
+        uuidRef.current = chatId;
         setMessages(selectedChatMessages);
         setShowInput(true);
       } else {
@@ -487,15 +509,17 @@ function Chat({navigation}) {
     }
   };
 
- 
   const handleChatClick = async () => {
     if (!chatText.trim()) return;
 
+    const currentChatId = uuidRef.current;
+
     const newUserMessage = {
       id: Date.now().toString(),
-      chatId: uuid,
+      chatId: currentChatId,
       text: chatText,
       sender: 'user',
+      type: 'chat',
     };
 
     setMessages(prevMessages => [...prevMessages, newUserMessage]);
@@ -504,25 +528,35 @@ function Chat({navigation}) {
 
     try {
       const response = await axios.post(
-        'https://api.openai.com/v1/chat/completions',
+        'http://103.168.18.197:8000/gennie/v1/api/text',
         {
-          model: 'gpt-4',
-          messages: [
-            {role: 'system', content: 'You are a helpful assistant.'},
-            {role: 'user', content: chatText},
-          ],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
+          user_id: '8d02b643-b8a3-40bf-9f55-82a52a0fd71e',
+          session_id: 'e211ab67-9e6d-445f-afc5-7b0d6175abc1',
+          stream: false,
+          text: chatText,
         },
       );
-      const botResponse = response.data.choices[0].message.content;
+      // const response = await axios.post(
+      //   'https://api.openai.com/v1/chat/completions',
+      //   {
+      //     model: 'gpt-4',
+      //     messages: [
+      //       {role: 'system', content: 'You are a helpful assistant.'},
+      //       {role: 'user', content: chatText},
+      //     ],
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
+      //       'Content-Type': 'application/json',
+      //     },
+      //   },
+      // );
+      // const botResponse = response.data.choices[0].message.content;
+      const botResponse = response.data.response_text;
       const newBotMessage = {
         id: (Date.now() + 1).toString(),
-        chatId: uuid,
+        chatId: currentChatId,
         text: botResponse,
         sender: 'ai',
       };
@@ -536,7 +570,12 @@ function Chat({navigation}) {
 
   return (
     <ScreenWrapper isSpecialBg={showInput}>
-      
+      <View style={styles.addChatContainer}>
+        <TouchableOpacity style={styles.addChatIcon} onPress={handleNewChat}>
+          <AddChatIcon />
+        </TouchableOpacity>
+      </View>
+
       {!showInput && (
         <View style={styles.imageContainer}>
           {!showInput && !showChatBubble && (
@@ -582,7 +621,7 @@ function Chat({navigation}) {
           start={{x: 0.5, y: 0}}
           end={{x: 0.5, y: 1}}
           style={styles.chatContainer}>
-          <View style={styles.chatContainer}>
+          <View>
             <ScrollView
               ref={scrollViewRef}
               showsVerticalScrollIndicator={false}
@@ -632,11 +671,8 @@ function Chat({navigation}) {
                 <ShareIcon />
               </TouchableOpacity>
             </View>
-            <View style={styles.gennieWrapper}>
-              <Image
-                source={require('../../assets/Images/chatLogo.png')}
-                style={styles.gennieImage}
-              />
+            <View>
+              <Image source={require('../../assets/Images/chatLogo.png')} />
             </View>
           </View>
         ) : (
@@ -648,83 +684,9 @@ function Chat({navigation}) {
 }
 
 const styles = StyleSheet.create({
-  modal: {
-    justifyContent: 'flex-start',
-    margin: 0,
-    marginTop: 60,
-    alignItems: 'flex-end',
-    paddingRight: 20,
-  },
-  dropdown: {
-    backgroundColor: 'rgba(255, 255, 255, 0.56)',
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.white,
-    width: 100,
-  },
-  menuItem: {
-    paddingVertical: 10,
-  },
-  menuText: {
-    fontSize: 16,
-    color: '#282828',
-    fontFamily: FontFamily.SpaceGrotesk,
-    fontWeight: '400',
-  },
-  bottomModal: {
-    justifyContent: 'flex-end',
-    margin: 0,
-  },
-  drawer: {
-    height: '70%',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 30,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth: 1.5,
-    borderColor: Colors.white,
-  },
-  dateHeader: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.white,
-    fontFamily: FontFamily.SpaceGrotesk,
-  },
-  chatItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRadius: 100,
-    paddingRight: 16,
-    paddingLeft: 7,
-    paddingBottom: 7,
-    paddingTop: 7,
-    marginVertical: 8,
-    marginTop: 5,
-    marginBottom: 20,
-  },
-  icon: {
-    width: 40,
-    height: 40,
-    borderRadius: 100,
-    backgroundColor: '#4A05AD',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-    padding: 4,
-  },
-  chatText: {
-    flex: 1,
-    fontSize: 16,
-    color: '#494949E5',
-    fontWeight: '400',
-    fontFamily: FontFamily.Inter,
-  },
-
   chatContainer: {
     flex: 1,
-    padding: 10,
+    padding: 25,
     marginBottom: 60,
     marginTop: 20,
     borderTopLeftRadius: 12,
@@ -765,8 +727,8 @@ const styles = StyleSheet.create({
   },
 
   addChatContainer: {
-    paddingTop: 25,
-    paddingRight: 10,
+    paddingTop: 20,
+    paddingRight: 5,
     display: 'flex',
     alignItems: 'flex-end',
   },
@@ -801,10 +763,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-  },
-  gennieImage: {
-    width: 30,
-    height: 30,
   },
   expandedContainer: {
     position: 'absolute',
@@ -842,23 +800,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FontFamily.SpaceGrotesk,
     fontWeight: '400',
-    color: Colors.darkGray,
+    color: '#5A5A5A',
     borderRadius: 8,
     backgroundColor: '#C6B0F942',
     paddingLeft: 14,
-    paddingRight: 40,
-    paddingVertical: 15,
-  },
-  gennieWrapper: {
-    backgroundColor: Colors.white,
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingRight: 42,
   },
 });
 
 export default Chat;
-

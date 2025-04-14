@@ -7,6 +7,7 @@ import {
   Text,
   Dimensions,
   ImageBackground,
+  Platform,
 } from 'react-native';
 import {CircleIcon, DownArrowIcon} from '../../components/Icons';
 import BackButton from '../../components/BackButton';
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     resizeMode: 'cover',
-    paddingTop:Platform.OS ==='ios' ? 50 : '',
+    paddingTop: Platform.OS === 'ios' ? 50 : '',
   },
   downArrowIcon: {
     backgroundColor: Colors.deepViolet,
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 10,
-    zIndex:99,
+    zIndex: 99,
   },
   skipText: {
     color: Colors.deepViolet,
