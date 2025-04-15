@@ -12,6 +12,7 @@ import OtpSent from './src/screens/otpSent/otpSent';
 import CreatePassword from './src/screens/createPassword/createPassword';
 import Onboarding from './src/screens/onboarding/onboarding';
 import BottomTabs from './src/navigation/BottomTabs';
+import TermsConditions from './src/screens/termsConditions/termsConditions';
 
 const Stack = createStackNavigator();
 
@@ -72,6 +73,11 @@ function App() {
           <Stack.Screen
             name="Main"
             component={BottomTabs}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="TermsConditions"
+            component={TermsConditions}
             options={{headerShown: false}}
           />
         </Stack.Navigator>

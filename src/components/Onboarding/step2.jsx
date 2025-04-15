@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Image,
@@ -13,6 +13,7 @@ import {CircleIcon, DownArrowIcon} from '../../components/Icons';
 import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import * as Animatable from 'react-native-animatable';
+import Tts from 'react-native-tts';
 
 const {width, height} = Dimensions.get('window');
 
@@ -37,6 +38,21 @@ const Dot = ({size, color, style, animation, delay = 0}) => (
 );
 
 const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
+  const text =
+    'Gennie is an AI mentor that empowers professionals with expert guidance, career insights, and skill development support.';
+  useEffect(() => {
+    Tts.setDefaultLanguage('en-US');
+    Tts.setDefaultRate(0.5);
+    Tts.setDefaultPitch(1.0);
+    // Speak the subtitle text when the component mounts
+    Tts.speak(text, {
+      androidParams: {
+        KEY_PARAM_PAN: 0,
+        KEY_PARAM_VOLUME: 1.0,
+        KEY_PARAM_STREAM: 'STREAM_MUSIC',
+      },
+    });
+  }, []);
   return (
     <ImageBackground
       source={require('../../assets/Images/new_splash_screen.png')}

@@ -91,6 +91,7 @@ function Chat({navigation}) {
     };
 
     const handleTtsFinish = () => {
+      Voice.start('en-US');
       setIsSpeaking(false);
     };
 
@@ -805,7 +806,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#C6B0F942',
     paddingLeft: 14,
     paddingRight: 14,
-    paddingVertical:Platform.OS === 'ios'? 15 : '',
+    paddingVertical: Platform.OS === 'ios' ? 15 : '',
   },
 });
 

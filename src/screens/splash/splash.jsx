@@ -22,12 +22,30 @@ function Splash({navigation}) {
       navigation.navigate('Onboarding');
     } else {
       navigation.navigate('Main', {screen: 'Chat'});
+      // const isTermsConditions = await AsyncStorage.getItem('isTermsConditions');
+      // const isLanguage = await AsyncStorage.getItem('isLanguage');
+      // if (!isLanguage) {
+      //   navigation.navigate('SelectLanguage');
+      // } else if (!isTermsConditions) {
+      //   navigation.navigate('TermsConditions');
+      // } else {
+      //   navigation.navigate('Main', {screen: 'Chat'});
+      // }
     }
   };
   useEffect(async () => {
     const token = await AsyncStorage.getItem('token');
     if (token) {
       navigation.navigate('Main', {screen: 'Chat'});
+      // const isTermsConditions = await AsyncStorage.getItem('isTermsConditions');
+      // const isLanguage = await AsyncStorage.getItem('isLanguage');
+      // if (!isLanguage) {
+      //   navigation.navigate('SelectLanguage');
+      // } else if (!isTermsConditions) {
+      //   navigation.navigate('TermsConditions');
+      // } else {
+      //   navigation.navigate('Main', {screen: 'Chat'});
+      // }
     }
     setTimeout(() => {
       Animated.parallel([

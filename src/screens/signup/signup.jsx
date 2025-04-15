@@ -106,7 +106,17 @@ function Signup({navigation}) {
             'token',
             JSON.stringify(res?.data?.accessToken),
           );
-          navigation.navigate('Main', {screen: 'Chat'});
+          const isTermsConditions = await AsyncStorage.getItem(
+            'isTermsConditions',
+          );
+          const isLanguage = await AsyncStorage.getItem('isLanguage');
+          if (!isLanguage) {
+            navigation.navigate('SelectLanguage');
+          } else if (!isTermsConditions) {
+            navigation.navigate('TermsConditions');
+          } else {
+            navigation.navigate('Main', {screen: 'Chat'});
+          }
         }
       })
       .catch(error => {
@@ -143,7 +153,17 @@ function Signup({navigation}) {
               'token',
               JSON.stringify(res?.data?.accessToken),
             );
-            navigation.navigate('Main', {screen: 'Chat'});
+            const isTermsConditions = await AsyncStorage.getItem(
+              'isTermsConditions',
+            );
+            const isLanguage = await AsyncStorage.getItem('isLanguage');
+            if (!isLanguage) {
+              navigation.navigate('SelectLanguage');
+            } else if (!isTermsConditions) {
+              navigation.navigate('TermsConditions');
+            } else {
+              navigation.navigate('Main', {screen: 'Chat'});
+            }
           }
         })
         .catch(error => {
@@ -213,7 +233,17 @@ function Signup({navigation}) {
                   JSON.stringify(res?.data?.accessToken),
                 );
                 await AsyncStorage.setItem('appleUserId', JSON.stringify(user));
-                navigation.navigate('Main', {screen: 'Chat'});
+                const isTermsConditions = await AsyncStorage.getItem(
+                  'isTermsConditions',
+                );
+                const isLanguage = await AsyncStorage.getItem('isLanguage');
+                if (!isLanguage) {
+                  navigation.navigate('SelectLanguage');
+                } else if (!isTermsConditions) {
+                  navigation.navigate('TermsConditions');
+                } else {
+                  navigation.navigate('Main', {screen: 'Chat'});
+                }
               }
             })
             .catch(error => {

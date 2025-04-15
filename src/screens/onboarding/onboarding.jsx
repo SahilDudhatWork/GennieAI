@@ -66,7 +66,7 @@ const Onboarding = ({navigation}) => {
       ...prev,
       step4: false,
     }));
-    navigation.replace('Login');
+    navigation.replace('SelectLanguage');
   };
 
   const handleSkip = () => {
