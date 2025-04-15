@@ -308,31 +308,31 @@ function Chat({navigation}) {
         type: 'speak',
       };
 
-      const response = await axios.post(
-        'http://103.168.18.197:8000/gennie/v1/api/text',
-        {
-          user_id: '8d02b643-b8a3-40bf-9f55-82a52a0fd71e',
-          session_id: 'e211ab67-9e6d-445f-afc5-7b0d6175abc1',
-          stream: false,
-          text: userQuery,
-        },
-      );
       // const response = await axios.post(
-      //   'https://api.openai.com/v1/chat/completions',
+      //   'http://103.168.18.197:8000/gennie/v1/api/text',
       //   {
-      //     model: 'gpt-3.5-turbo',
-      //     messages: [{role: 'user', content: userQuery}],
-      //   },
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
-      //       'Content-Type': 'application/json',
-      //     },
+      //     user_id: '8d02b643-b8a3-40bf-9f55-82a52a0fd71e',
+      //     session_id: 'e211ab67-9e6d-445f-afc5-7b0d6175abc1',
+      //     stream: false,
+      //     text: userQuery,
       //   },
       // );
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-3.5-turbo',
+          messages: [{role: 'user', content: userQuery}],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
 
-      // const aiResponse = response.data.choices[0].message.content.trim();
-      const aiResponse = response.data.response_text;
+      const aiResponse = response.data.choices[0].message.content.trim();
+      // const aiResponse = response.data.response_text;
 
       const newBotMessage = {
         id: (Date.now() + 1).toString(),
@@ -527,33 +527,33 @@ function Chat({navigation}) {
     setShowChatBubble(false);
 
     try {
-      const response = await axios.post(
-        'http://103.168.18.197:8000/gennie/v1/api/text',
-        {
-          user_id: '8d02b643-b8a3-40bf-9f55-82a52a0fd71e',
-          session_id: 'e211ab67-9e6d-445f-afc5-7b0d6175abc1',
-          stream: false,
-          text: chatText,
-        },
-      );
       // const response = await axios.post(
-      //   'https://api.openai.com/v1/chat/completions',
+      //   'http://103.168.18.197:8000/gennie/v1/api/text',
       //   {
-      //     model: 'gpt-4',
-      //     messages: [
-      //       {role: 'system', content: 'You are a helpful assistant.'},
-      //       {role: 'user', content: chatText},
-      //     ],
-      //   },
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
-      //       'Content-Type': 'application/json',
-      //     },
+      //     user_id: '8d02b643-b8a3-40bf-9f55-82a52a0fd71e',
+      //     session_id: 'e211ab67-9e6d-445f-afc5-7b0d6175abc1',
+      //     stream: false,
+      //     text: chatText,
       //   },
       // );
-      // const botResponse = response.data.choices[0].message.content;
-      const botResponse = response.data.response_text;
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-4',
+          messages: [
+            {role: 'system', content: 'You are a helpful assistant.'},
+            {role: 'user', content: chatText},
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Config.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      const botResponse = response.data.choices[0].message.content;
+      // const botResponse = response.data.response_text;
       const newBotMessage = {
         id: (Date.now() + 1).toString(),
         chatId: currentChatId,
@@ -804,7 +804,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#C6B0F942',
     paddingLeft: 14,
-    paddingRight: 42,
+    paddingRight: 14,
+    paddingVertical:Platform.OS === 'ios'? 15 : '',
   },
 });
 

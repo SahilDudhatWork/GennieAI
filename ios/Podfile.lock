@@ -1701,7 +1701,7 @@ PODS:
     - React-Core
   - RNPermissions (5.3.0):
     - React-Core
-  - RNScreens (3.30.1):
+  - RNScreens (3.37.0):
     - DoubleConversion
     - glog
     - RCT-Folly (= 2024.01.01.00)
@@ -1716,6 +1716,7 @@ PODS:
     - React-jsi
     - React-NativeModulesApple
     - React-RCTFabric
+    - React-RCTImage
     - React-rendererdebug
     - React-utils
     - ReactCodegen
@@ -2113,7 +2114,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: ffb1f106c7a78377a2ae7568d51ccf87dc5c83c6
   RNGoogleSignin: b8760528f2a7cbe157ecfdcc13bdb7d2745c9389
   RNPermissions: 133de0bb80402e6b5d83364b864f55ea5247b14b
-  RNScreens: c123f1d07331f65ad4397fb2bc457628f27c77ff
+  RNScreens: ccb312d3a830ab7a8d10c6c2b82c18ef0b0d19e6
   RNSVG: 7d403633772d39f695b8a1ccb64db8499e807dac
   RNVectorIcons: 583bec7c6eebf5cb1bce8a8c2142b336ca7a22b6
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
