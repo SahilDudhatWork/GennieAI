@@ -230,6 +230,10 @@ function Login({navigation}) {
     }
   };
 
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
+
   return (
     <>
       <ScreenWrapper>
@@ -241,7 +245,7 @@ function Login({navigation}) {
               height: Height - 40,
             }}>
             <View>
-              <BackButton />
+              <BackButton handleBackNext={handleBackNext} />
             </View>
             <View style={styles.inputSeaction}>
               <Text style={styles.loginTitleText}>Login</Text>

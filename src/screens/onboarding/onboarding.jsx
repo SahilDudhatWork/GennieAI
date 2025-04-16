@@ -70,7 +70,7 @@ const Onboarding = ({navigation}) => {
   };
 
   const handleSkip = () => {
-    navigation.replace('Login');
+    navigation.replace('SelectLanguage');
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard,SafeAreaView} from 'react-native';
+import {Keyboard, SafeAreaView} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Chat from '../screens/chat/chat';
 import ChatHistory from '../screens/chatHistory/chatHistory';
@@ -32,13 +32,13 @@ const BottomTabs = () => {
       screenOptions={{headerShown: false}}
       tabBar={({navigation}) =>
         !keyboardShown && (
-          <SafeAreaView edges={['bottom']} style={{ backgroundColor: 'white' }}>
-          <BottomNavigator
-            selectedTab={selectedTab}
-            setSelectedTab={setSelectedTab}
-            navigation={navigation}
-          />
-        </SafeAreaView>
+          <SafeAreaView edges={['bottom']} style={{backgroundColor: 'white'}}>
+            <BottomNavigator
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              navigation={navigation}
+            />
+          </SafeAreaView>
         )
       }>
       <Tab.Screen

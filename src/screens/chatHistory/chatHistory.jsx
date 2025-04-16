@@ -3,7 +3,6 @@ import ScreenWrapper from '../../components/ScreenWrapper';
 import {StyleSheet, Text, View, TouchableOpacity, FlatList} from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import {
-  AddChatIcon,
   MessageIcon,
   MicroPhoneIcon,
   SideArrowIcon,
@@ -95,20 +94,9 @@ function ChatHistory({navigation}) {
   return (
     <ScreenWrapper style={{padding: 0}} isSpecialBg={true}>
       <View style={styles.container}>
-        <View style={styles.addChatContainer}>
+        <View style={styles.historyContainer}>
           <Text style={styles.historyText}>History</Text>
-          <TouchableOpacity
-            style={styles.addChatIcon}
-            onPress={() =>
-              navigation.navigate('Main', {
-                screen: 'Chat',
-                params: {startNewChat: true},
-              })
-            }>
-            <AddChatIcon />
-          </TouchableOpacity>
         </View>
-
         <BlurView
           style={styles.drawerBlur}
           blurType="light"
@@ -204,11 +192,10 @@ const styles = StyleSheet.create({
     color: Colors.darkGray,
   },
 
-  addChatContainer: {
+  historyContainer: {
     flexDirection: 'row',
     paddingTop: 20,
     paddingHorizontal: 20,
-    justifyContent: 'space-between',
   },
 
   scrollContainer: {

@@ -66,11 +66,16 @@ function CreatePassword({navigation}) {
         console.log(error, 'error');
       });
   };
+
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
+
   return (
     <ScreenWrapper>
       <View style={[styles.container, {height: Height - 40}]}>
         <View>
-          <BackButton />
+          <BackButton handleBackNext={handleBackNext} />
         </View>
         <View style={styles.inputSeaction}>
           <Text style={styles.newPasswordText}>New Password</Text>

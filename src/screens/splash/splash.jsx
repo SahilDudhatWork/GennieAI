@@ -92,6 +92,7 @@ function Splash({navigation}) {
           <View
             style={{
               justifyContent: 'flex-end',
+              paddingBottom: 40,
             }}>
             <TouchableOpacity
               style={styles.buttonGetStarted}
@@ -123,8 +124,8 @@ const styles = StyleSheet.create({
     ],
   },
   image: {
-    width: 244,
-    height: 326,
+    width: 210,
+    height: 260,
   },
   buttonGetStarted: {
     backgroundColor: Colors.deepViolet,

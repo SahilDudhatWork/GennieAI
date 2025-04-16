@@ -13,6 +13,7 @@ import {CircleIcon, DownArrowIcon} from '../../components/Icons';
 import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import Tts from 'react-native-tts';
+import {useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -36,6 +37,8 @@ const Dot = ({size, color, style, animation, delay = 0}) => (
   />
 );
 const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
+  const navigation = useNavigation();
+
   const text =
     'Gennie is a smart AI tutor designed to help students learn efficiently with personalized guidance and instant support';
   useEffect(() => {
@@ -50,7 +53,15 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
         KEY_PARAM_STREAM: 'STREAM_MUSIC',
       },
     });
+    return () => {
+      Tts.stop();
+    };
   }, []);
+
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
+
   return (
     <LinearGradient colors={['#FFFFFF', '#F0F0F8']} style={styles.container}>
       <Animatable.Image
@@ -62,7 +73,7 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
       />
 
       <View style={styles.topRow}>
-        <BackButton />
+        <BackButton handleBackNext={handleBackNext} />
         <TouchableOpacity onPress={handleSkipStep1}>
           <Animatable.Text
             animation="fadeInRight"

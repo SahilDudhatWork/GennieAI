@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -13,13 +13,14 @@ import BackButton from '../../components/BackButton';
 import langs from 'langs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import CountryPicker from 'react-native-country-picker-modal';
+import CountryFlag from 'react-native-country-flag';
 
 const Height = Dimensions.get('window').height;
 
 function SelectLanguage({navigation}) {
   const [open, setOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
-  const [countryCode, setCountryCode] = useState('US');
+  // const [countryCode, setCountryCode] = useState('US');
 
   const handleNext = async () => {
     const isLanguage = await AsyncStorage.getItem('isLanguage');
@@ -29,21 +30,21 @@ function SelectLanguage({navigation}) {
     navigation.replace('TermsConditions');
   };
 
-  const languageOptions = useMemo(() => {
-    return langs
-      .names()
-      .map(name => {
-        const lang = langs.where('name', name);
-        if (!lang) return null;
+  // const languageOptions = useMemo(() => {
+  //   return langs
+  //     .names()
+  //     .map(name => {
+  //       const lang = langs.where('name', name);
+  //       if (!lang) return null;
 
-        const languageCode = lang['1'];
-        return {
-          label: name,
-          value: languageCode,
-        };
-      })
-      .filter(Boolean);
-  }, []);
+  //       const languageCode = lang['1'];
+  //       return {
+  //         label: name,
+  //         value: languageCode,
+  //       };
+  //     })
+  //     .filter(Boolean);
+  // }, []);
 
   // const languageOptions = useMemo(() => {
   //   return langs
@@ -57,14 +58,11 @@ function SelectLanguage({navigation}) {
   //       return {
   //         label: (
   //           <View style={styles.languageItem}>
-  //             {/* <CountryPicker
-  //               countryCode={countryCode}
-  //               withFlag
-  //               withCountryNameButton={false}
-  //               withAlphaFilter={false}
-  //               withCallingCode={false}
-  //               onSelect={country => setCountryCode(country.cca2)}
-  //             /> */}
+  //             <CountryFlag
+  //               isoCode={languageCode}
+  //               size={25}
+  //               style={styles.flag}
+  //             />
   //             <Text style={styles.languageText}>{name}</Text>
   //           </View>
   //         ),
@@ -72,12 +70,39 @@ function SelectLanguage({navigation}) {
   //       };
   //     })
   //     .filter(Boolean);
-  // }, [countryCode]);
+  // }, []);
+
+  const languageOptions = useMemo(() => {
+    const options = [
+      {name: 'English', code: 'en', countryCode: 'US'},
+      {name: 'Hindi', code: 'hi', countryCode: 'IN'},
+      {name: 'French', code: 'fr', countryCode: 'FR'},
+      {name: 'Chinese', code: 'zh', countryCode: 'CN'},
+    ];
+
+    return options.map(lang => ({
+      label: (
+        <View style={styles.languageItem}>
+          <CountryFlag
+            isoCode={lang.countryCode}
+            size={25}
+            style={styles.flag}
+          />
+          <Text style={styles.languageText}>{lang.name}</Text>
+        </View>
+      ),
+      value: lang.code,
+    }));
+  }, []);
+
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
 
   return (
     <ScreenWrapper style={styles.container}>
       <View>
-        <BackButton />
+        <BackButton handleBackNext={handleBackNext} />
       </View>
       <View style={{paddingTop: 80}}>
         <Text style={styles.selectLanguageText}>Select your Language</Text>
@@ -173,6 +198,12 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: Colors.darkGray,
     fontFamily: FontFamily.SpaceGrotesk,
+  },
+  flag: {
+    marginRight: 10,
+    borderRadius: 4,
+    width: 26,
+    height: 20,
   },
 });
 

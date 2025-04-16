@@ -265,6 +265,10 @@ function Signup({navigation}) {
     }
   };
 
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
+
   return (
     <>
       <ScreenWrapper isSpecialBg={true}>
@@ -272,7 +276,7 @@ function Signup({navigation}) {
           style={styles.container}
           showsVerticalScrollIndicator={false}>
           <View>
-            <BackButton />
+            <BackButton handleBackNext={handleBackNext} />
           </View>
           <View style={{paddingTop: 30}}>
             <Text style={styles.signUpText}>Sign up</Text>

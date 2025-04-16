@@ -14,6 +14,7 @@ import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import * as Animatable from 'react-native-animatable';
 import Tts from 'react-native-tts';
+import {useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -38,6 +39,8 @@ const Dot = ({size, color, style, animation, delay = 0}) => (
 );
 
 const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
+  const navigation = useNavigation();
+
   const text =
     'Gennie is an AI mentor that empowers professionals with expert guidance, career insights, and skill development support.';
   useEffect(() => {
@@ -52,13 +55,21 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
         KEY_PARAM_STREAM: 'STREAM_MUSIC',
       },
     });
+    return () => {
+      Tts.stop();
+    };
   }, []);
+
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
+
   return (
     <ImageBackground
       source={require('../../assets/Images/new_splash_screen.png')}
       style={styles.background}>
       <View style={styles.topRow}>
-        <BackButton style={{zIndex: 10}} />
+        <BackButton handleBackNext={handleBackNext} />
         <TouchableOpacity onPress={handleSkipStep2}>
           <Animatable.Text
             style={styles.skipText}

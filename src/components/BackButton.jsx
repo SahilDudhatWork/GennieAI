@@ -1,14 +1,11 @@
 import React from 'react';
 import {TouchableOpacity, View, StyleSheet} from 'react-native';
 import {BackIcon} from './Icons';
-import {useNavigation} from '@react-navigation/native';
-import { Colors } from '../../Utils/Themes';
+import {Colors} from '../../Utils/Themes';
 
-const BackButton = () => {
-  const navigation = useNavigation();
-
+const BackButton = ({handleBackNext}) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+    <TouchableOpacity style={styles.button} onPress={handleBackNext}>
       <View style={styles.iconContainer}>
         <BackIcon />
       </View>

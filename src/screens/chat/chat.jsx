@@ -31,6 +31,7 @@ import Config from '../../../config';
 import LottieView from 'lottie-react-native';
 import {LinearGradient} from 'react-native-linear-gradient';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
+import BackButton from '../../components/BackButton';
 
 function Chat({navigation}) {
   const [showInput, setShowInput] = useState(false);
@@ -51,9 +52,10 @@ function Chat({navigation}) {
 
   useFocusEffect(
     useCallback(() => {
-      if (route.params?.setSelectedTab) {
-        route.params.setSelectedTab('Chat');
-      }
+      setShowInput(false);
+      // if (route.params?.setSelectedTab) {
+      //   route.params.setSelectedTab('Chat');
+      // }
     }, [route.params]),
   );
 
@@ -91,7 +93,14 @@ function Chat({navigation}) {
     };
 
     const handleTtsFinish = () => {
-      Voice.start('en-US');
+      if (!isListening) {
+        try {
+          Voice.start('en-US');
+          console.log('Listening started');
+        } catch (e) {
+          console.error('Voice start failed', e);
+        }
+      }
       setIsSpeaking(false);
     };
 
@@ -99,9 +108,9 @@ function Chat({navigation}) {
       setIsSpeaking(false);
     };
 
-    Tts.addEventListener('tts-start', handleTtsStart);
-    Tts.addEventListener('tts-finish', handleTtsFinish);
-    Tts.addEventListener('tts-cancel', handleTtsCancel);
+    // Tts.addEventListener('tts-start', handleTtsStart);
+    // Tts.addEventListener('tts-finish', handleTtsFinish);
+    // Tts.addEventListener('tts-cancel', handleTtsCancel);
 
     const startSub = Tts.addEventListener('tts-start', handleTtsStart);
     const finishSub = Tts.addEventListener('tts-finish', handleTtsFinish);
@@ -188,7 +197,7 @@ function Chat({navigation}) {
 
   const onSpeechError = useCallback(
     async e => {
-      console.error('Speech error:', e);
+      // console.error('Speech error:', e);
       setIsListening(false);
 
       if (e.error.code === '2' && retryCount < MAX_RETRY) {
@@ -215,10 +224,10 @@ function Chat({navigation}) {
           );
         }
       } else {
-        Alert.alert(
-          'Speech Recognition Error',
-          'There was a problem with speech recognition. Please try again.',
-        );
+        // Alert.alert(
+        //   'Speech Recognition Error',
+        //   'There was a problem with speech recognition. Please try again.',
+        // );
         setRetryCount(0);
       }
     },
@@ -448,14 +457,6 @@ function Chat({navigation}) {
     }
   }, [route.params]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (route.params?.startNewChat) {
-        handleNewChat();
-      }
-    }, [route.params]),
-  );
-
   const saveMessagesToStorage = async newMessages => {
     try {
       const storedMessages = await AsyncStorage.getItem('chatMessages');
@@ -477,6 +478,9 @@ function Chat({navigation}) {
     setMessages([]);
     setShowInput(false);
     setChatText('');
+    if (route.params?.setSelectedTab) {
+      route.params.setSelectedTab('Chat');
+    }
     return newId;
   };
 
@@ -569,9 +573,27 @@ function Chat({navigation}) {
     }
   };
 
+  const handleToggle = () => {
+    setShowInput(!showInput);
+    if (route.params?.setSelectedTab) {
+      route.params.setSelectedTab('Chat');
+    }
+  };
+
   return (
     <ScreenWrapper isSpecialBg={showInput}>
-      <View style={styles.addChatContainer}>
+      <View
+        style={[
+          styles.addChatContainer,
+          showInput
+            ? {flexDirection: 'row', justifyContent: 'space-between'}
+            : {display: 'flex', alignItems: 'flex-end'},
+        ]}>
+        {showInput && (
+          <TouchableOpacity>
+            <BackButton handleBackNext={() => navigation.navigate('History')} />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity style={styles.addChatIcon} onPress={handleNewChat}>
           <AddChatIcon />
         </TouchableOpacity>
@@ -654,7 +676,7 @@ function Chat({navigation}) {
       <TouchableOpacity
         style={showInput ? styles.expandedContainer : styles.startChatContainer}
         activeOpacity={1}
-        onPress={() => setShowInput(!showInput)}>
+        onPress={handleToggle}>
         {showInput ? (
           <View style={styles.inputWrapper}>
             <View style={styles.inputContainer}>
@@ -730,8 +752,6 @@ const styles = StyleSheet.create({
   addChatContainer: {
     paddingTop: 20,
     paddingRight: 5,
-    display: 'flex',
-    alignItems: 'flex-end',
   },
   imageContainer: {
     paddingTop: 25,

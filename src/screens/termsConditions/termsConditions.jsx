@@ -30,19 +30,19 @@ function TermsConditions({navigation}) {
       title: 'Security is our priority',
       description:
         'The App is a safe and convenient way to manage your account.',
-      image: require('../../assets/Images/slider1.png'),
+      image: require('../../assets/Images/slider1.webp'),
     },
     {
       id: '2',
       title: 'Privacy is everything',
       description: 'Your privacy is Important to us.',
-      image: require('../../assets/Images/slider2.png'),
+      image: require('../../assets/Images/slider2.webp'),
     },
     {
       id: '3',
       title: 'Agree on safety',
       description: 'Keeping your a account safe is a top priority',
-      image: require('../../assets/Images/slider3.png'),
+      image: require('../../assets/Images/slider3.webp'),
     },
   ];
 
@@ -50,6 +50,9 @@ function TermsConditions({navigation}) {
     fetchData();
   }, []);
 
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
   const fetchData = async () => {
     setTermsData(
       `<p>Welcome to Your App Name. By using our mobile application, you agree to comply with and be bound by the following Terms and Conditions. If you do not agree with these terms, please do not use the App.</p><p><strong>Acceptance of Terms</strong></p><p>By downloading, installing, and using the App, you agree to these Terms and our Privacy Policy. We reserve the right to update or modify these Terms at any time.</p><p><strong>1. Use of the App</strong></p><ul><li>You must be at least age years old to use the App.</li><li>You agree to use the App for lawful purposes only.</li><li>You are responsible for maintaining the confidentiality of your account credentials.</li></ul><p><strong>2. User Content</strong></p><ul><li>You retain ownership of any content you upload but grant us a license to use, modify, and distribute it as necessary for App functionality.</li><li>You must not upload illegal, harmful, or copyrighted content without permission.</li></ul><p><strong>3. Prohibited Activities</strong></p><ul><li>Engage in fraud, hacking, or other malicious activities.App.</li></ul>`,
@@ -90,12 +93,10 @@ function TermsConditions({navigation}) {
 
   return (
     <ScreenWrapper isSpecialBg={true}>
-      <ScrollView
-        style={[styles.container]}
-        showsVerticalScrollIndicator={false}>
-        <View>
-          <BackButton />
-        </View>
+      <View style={[styles.container]} showsVerticalScrollIndicator={false}>
+        <TouchableOpacity>
+          <BackButton handleBackNext={handleBackNext} />
+        </TouchableOpacity>
         <View style={styles.termsConditionsContainer}>
           <Text style={styles.termsConditionsText}>Terms & Conditions</Text>
           <View style={styles.timeContainer}>
@@ -122,70 +123,75 @@ function TermsConditions({navigation}) {
           </ScrollView>
         </View>
 
-        <TouchableOpacity style={styles.buttonIAgree} onPress={handleIAgree}>
-          <Text style={styles.buttonText}>I agree...</Text>
-        </TouchableOpacity>
+        <View style={styles.bottomWrapper}>
+          <TouchableOpacity style={styles.buttonIAgree} onPress={handleIAgree}>
+            <Text style={styles.buttonText}>I agree...</Text>
+          </TouchableOpacity>
 
-        <View style={[styles.sliderContainer]}>
-          <FlatList
-            data={slides}
-            ref={flatListRef}
-            keyExtractor={item => item.id}
-            horizontal
-            pagingEnabled
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            showsHorizontalScrollIndicator={false}
-            renderItem={({item}) => (
-              <View style={[styles.slide]}>
-                <View style={styles.imageTextContainer}>
-                  <View style={{position: 'relative'}}>
-                    <Image source={item.image} style={styles.image} />
-                    <LinearGradient
-                      colors={['#007AFF', '#004999']}
-                      start={{x: 1, y: 0}}
-                      end={{x: 0, y: 0}}
-                      style={{
-                        width: 15,
-                        height: 15,
-                        borderRadius: 7.5,
-                        position: 'absolute',
-                        right: 40,
-                        bottom: 4,
-                      }}
-                    />
-                    <LinearGradient
-                      colors={['#5EABFF', '#396799']}
-                      start={{x: 1, y: 0}}
-                      end={{x: 0, y: 0}}
-                      style={{
-                        width: 9,
-                        height: 9,
-                        borderRadius: 7.5,
-                        position: 'absolute',
-                        right: 25,
-                        top: 25,
-                      }}
-                    />
-                  </View>
-                  <View style={styles.textWrapper}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.description}>{item.description}</Text>
+          <View style={[styles.sliderContainer]}>
+            <FlatList
+              data={slides}
+              ref={flatListRef}
+              keyExtractor={item => item.id}
+              horizontal
+              pagingEnabled
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({item}) => (
+                <View style={[styles.slide]}>
+                  <View style={styles.imageTextContainer}>
+                    <View style={{position: 'relative'}}>
+                      <Image source={item.image} style={styles.image} />
+                      <LinearGradient
+                        colors={['#007AFF', '#004999']}
+                        start={{x: 1, y: 0}}
+                        end={{x: 0, y: 0}}
+                        style={{
+                          width: 15,
+                          height: 15,
+                          borderRadius: 7.5,
+                          position: 'absolute',
+                          right: 40,
+                          bottom: 4,
+                        }}
+                      />
+                      <LinearGradient
+                        colors={['#5EABFF', '#396799']}
+                        start={{x: 1, y: 0}}
+                        end={{x: 0, y: 0}}
+                        style={{
+                          width: 9,
+                          height: 9,
+                          borderRadius: 7.5,
+                          position: 'absolute',
+                          right: 25,
+                          top: 25,
+                        }}
+                      />
+                    </View>
+                    <View style={styles.textWrapper}>
+                      <Text style={styles.title}>{item.title}</Text>
+                      <Text style={styles.description}>{item.description}</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
-            )}
-          />
-          <View style={styles.dotsWrapper}>
-            {slides.map((_, index) => (
-              <View
-                key={index}
-                style={[styles.dot, currentIndex === index && styles.activeDot]}
-              />
-            ))}
+              )}
+            />
+            <View style={styles.dotsWrapper}>
+              {slides.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    currentIndex === index && styles.activeDot,
+                  ]}
+                />
+              ))}
+            </View>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </ScreenWrapper>
   );
 }
@@ -195,16 +201,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   termsConditionsContainer: {
-    paddingTop: 40,
+    paddingTop: 25,
     display: 'flex',
     alignItems: 'center',
   },
   newTextStyle: {
-    maxHeight: Dimensions.get('window').height * 0.35,
+    // maxHeight: Dimensions.get('window').height * 0.3,
+    maxHeight: Dimensions.get('window').height - 430,
     width: '100%',
   },
   textContainer: {
-    paddingTop: 40,
+    paddingTop: 25,
     backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.white,
@@ -237,12 +244,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.deepViolet,
     borderRadius: 22,
     width: '100%',
-    marginTop: 40,
+    marginTop: 25,
     padding: 12,
   },
 
   sliderContainer: {
-    marginTop: 40,
+    marginTop: 30,
   },
   slide: {
     justifyContent: 'center',
@@ -291,8 +298,6 @@ const styles = StyleSheet.create({
   dotsWrapper: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 10,
-    marginBottom: 10,
   },
   dot: {
     width: 8,
@@ -306,6 +311,10 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 100,
+  },
+  bottomWrapper: {
+    position: 'absolute',
+    bottom: 0,
   },
 });
 export default TermsConditions;

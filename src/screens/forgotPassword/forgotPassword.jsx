@@ -53,11 +53,15 @@ function ForgetPassword({navigation}) {
       });
   };
 
+  const handleBackNext = () => {
+    navigation.goBack();
+  };
+
   return (
     <ScreenWrapper>
       <View style={[styles.container, {height: Height - 40}]}>
         <View>
-          <BackButton />
+          <BackButton handleBackNext={handleBackNext} />
         </View>
         <View style={styles.inputSeaction}>
           <Text style={styles.forgotPasswordText}>Forgot Password</Text>
