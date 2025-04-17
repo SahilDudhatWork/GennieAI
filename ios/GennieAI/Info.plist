@@ -45,7 +45,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need mic access to convert your voice</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -59,7 +59,7 @@
 		<string>arm64</string>
 	</array>
 	<key>UIStatusBarStyle</key>
-	<string></string>
+	<string/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -73,5 +73,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SpaceGrotesk-Bold.ttf</string>
+		<string>SpaceGrotesk-Light.ttf</string>
+		<string>SpaceGrotesk-Medium.ttf</string>
+		<string>SpaceGrotesk-Regular.ttf</string>
+		<string>SpaceGrotesk-SemiBold.ttf</string>
+		<string>times-new-roman-bold-italic.ttf</string>
+		<string>times-new-roman-bold.ttf</string>
+		<string>times-new-roman-italic.ttf</string>
+		<string>times-new-roman.ttf</string>
+	</array>
 </dict>
 </plist>

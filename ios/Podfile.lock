@@ -1395,6 +1395,8 @@ PODS:
     - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
+  - react-native-render-html (6.3.4):
+    - React-Core
   - react-native-safe-area-context (5.3.0):
     - React-Core
   - react-native-voice (3.2.4):
@@ -1796,6 +1798,7 @@ DEPENDENCIES:
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-voice (from `../node_modules/@react-native-voice/voice`)"
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
@@ -1939,6 +1942,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-render-html:
+    :path: "../node_modules/react-native-render-html"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-voice:
@@ -2078,6 +2083,7 @@ SPEC CHECKSUMS:
   react-native-blur: 83cec1a7a7036a371da2bce12b075a9f0d8c834b
   react-native-image-picker: e3719065c991aebf6c7ddb9c80e2cf90a21f7010
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
+  react-native-render-html: 5afc4751f1a98621b3009432ef84c47019dcb2bd
   react-native-safe-area-context: fdb0a66feac038cb6eb1edafcf2ccee2b5cf0284
   react-native-voice: 908a0eba96c8c3d643e4f98b7232c6557d0a6f9c
   React-nativeconfig: 174354b3e91ae72f95f1e4cb7c66af1b70209dd2
