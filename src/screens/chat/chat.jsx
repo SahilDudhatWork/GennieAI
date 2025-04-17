@@ -10,6 +10,10 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard
+
 } from 'react-native';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import {Colors, FontFamily} from '../../../Utils/Themes';
@@ -80,6 +84,7 @@ function Chat({navigation}) {
 
   useEffect(() => {
     Tts.setDefaultLanguage('en-US');
+    Tts.setDefaultVoice('en-us-x-sfg#male_1-local');
     Tts.setDefaultRate(0.5);
     Tts.setDefaultPitch(1.0);
     // Tts.voices().then(voices => console.log('voices--',voices));
@@ -583,129 +588,134 @@ function Chat({navigation}) {
   };
 
   return (
-    <ScreenWrapper isSpecialBg={showInput}>
-      <View
-        style={[
-          styles.addChatContainer,
-          showInput
-            ? {flexDirection: 'row', justifyContent: 'space-between'}
-            : {display: 'flex', alignItems: 'flex-end'},
-        ]}>
-        {showInput && (
-          <TouchableOpacity>
-            <BackButton handleBackNext={() => navigation.navigate('History')} />
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity style={styles.addChatIcon} onPress={handleNewChat}>
-          <AddChatIcon />
-        </TouchableOpacity>
-      </View>
-
-      {!showInput && (
-        <View style={styles.imageContainer}>
-          {!showInput && !showChatBubble && (
-            <Text style={styles.talkText}>
-              {isListening
-                ? i18n.t('chatPage.listening')
-                : isResponding
-                ? i18n.t('chatPage.processing')
-                : isSpeaking
-                ? i18n.t('chatPage.speaking')
-                : i18n.t('chatPage.tapToTalk')}
-            </Text>
-          )}
-
-          <TouchableOpacity
-            onPress={() => {
-              if (isButtonDisabled) {
-                if (isListening) {
-                  stopListening();
-                }
-                if (isSpeaking) {
-                  Tts.stop();
-                }
-              } else {
-                startListening();
-              }
-            }}
-            activeOpacity={0.7}
-            style={{opacity: isButtonDisabled ? 0.5 : 1}}>
-            <LottieView
-              style={{width: 200, height: 200}}
-              source={require('../../assets/gif/micAnimation.json')}
-              autoPlay={!isButtonDisabled}
-              loop={!isButtonDisabled}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {showInput && messages.length > 0 && (
-        <LinearGradient
-          colors={['#DAD4FF', '#FFFFFF00']}
-          start={{x: 0.5, y: 0}}
-          end={{x: 0.5, y: 1}}
-          style={styles.chatContainer}>
-          <View>
-            <ScrollView
-              ref={scrollViewRef}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flexGrow: 1}}
-              onContentSizeChange={() =>
-                scrollViewRef.current?.scrollToEnd({animated: true})
-              }>
-              {messages.map((msg, index) => (
-                <View
-                  key={`${msg.sender}-${index}`}
-                  style={[
-                    styles.messageBubble,
-                    msg.sender === 'user'
-                      ? styles.userMessage
-                      : styles.aiMessage,
-                  ]}>
-                  <Text
-                    style={
-                      msg.sender === 'user' ? styles.userText : styles.aiText
-                    }>
-                    {msg.text}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </LinearGradient>
-      )}
-      <TouchableOpacity
-        style={showInput ? styles.expandedContainer : styles.startChatContainer}
-        activeOpacity={1}
-        onPress={handleToggle}>
-        {showInput ? (
-          <View style={styles.inputWrapper}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.inputStyle}
-                placeholder={i18n.t('chatPage.askWhatMind')}
-                placeholderTextColor="#5A5A5A"
-                autoCapitalize="none"
-                value={chatText}
-                onChangeText={setChatText}
-              />
-              <TouchableOpacity
-                style={styles.shareIcon}
-                onPress={handleChatClick}>
-                <ShareIcon />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        {/* <View style={{ flex: 1 }}> */}
+          <ScreenWrapper isSpecialBg={showInput}>
+            <View
+              style={[
+                styles.addChatContainer,
+                showInput
+                  ? { flexDirection: 'row', justifyContent: 'space-between' }
+                  : { display: 'flex', alignItems: 'flex-end' },
+              ]}
+            >
+              {showInput && (
+                <TouchableOpacity>
+                  <BackButton handleBackNext={() => navigation.navigate('History')} />
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={styles.addChatIcon} onPress={handleNewChat}>
+                <AddChatIcon />
               </TouchableOpacity>
             </View>
-            <View>
-              <Image source={require('../../assets/Images/chatLogo.png')} />
-            </View>
-          </View>
-        ) : (
-          <StartChatIcon />
-        )}
-      </TouchableOpacity>
-    </ScreenWrapper>
+
+            {!showInput && (
+              <View style={styles.imageContainer}>
+                {!showInput && !showChatBubble && (
+                  <Text style={styles.talkText}>
+                    {isListening
+                ? i18n.t('chatPage.listening')
+                      : isResponding
+                ? i18n.t('chatPage.processing')
+                      : isSpeaking
+                ? i18n.t('chatPage.speaking')
+                : i18n.t('chatPage.tapToTalk')}
+                  </Text>
+                )}
+
+                <TouchableOpacity
+                  onPress={() => {
+                    if (isButtonDisabled) {
+                      if (isListening) stopListening();
+                      if (isSpeaking) Tts.stop();
+                    } else {
+                      startListening();
+                    }
+                  }}
+                  activeOpacity={0.7}
+                  style={{ opacity: isButtonDisabled ? 0.5 : 1 }}
+                >
+                  <LottieView
+                    style={{ width: 200, height: 200 }}
+                    source={require('../../assets/gif/micAnimation.json')}
+                    autoPlay={!isButtonDisabled}
+                    loop={!isButtonDisabled}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {showInput && messages.length > 0 && (
+              <LinearGradient
+                colors={['#DAD4FF', '#FFFFFF00']}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={styles.chatContainer}
+              >
+                <ScrollView
+                  ref={scrollViewRef}
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ flexGrow: 1 }}
+                
+                  onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                >
+                  {messages.map((msg, index) => (
+                    <View
+                      key={`${msg.sender}-${index}`}
+                      style={[
+                        styles.messageBubble,
+                        msg.sender === 'user'
+                          ? styles.userMessage
+                          : styles.aiMessage,
+                      ]}
+                    >
+                      <Text style={msg.sender === 'user' ? styles.userText : styles.aiText}>
+                        {msg.text}
+                      </Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              </LinearGradient>
+            )}
+
+            <TouchableOpacity
+              style={showInput ? styles.expandedContainer : styles.startChatContainer}
+              activeOpacity={1}
+              onPress={handleToggle}
+            >
+              {showInput ? (
+                <View style={styles.inputWrapper}>
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.inputStyle}
+                placeholder={i18n.t('chatPage.askWhatMind')}
+                      placeholderTextColor="#5A5A5A"
+                      autoCapitalize="none"
+                      value={chatText}
+                      onChangeText={setChatText}
+                    />
+                    <TouchableOpacity style={styles.shareIcon} onPress={handleChatClick}>
+                      <ShareIcon />
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    <Image source={require('../../assets/Images/chatLogo.png')} />
+                  </View>
+                </View>
+              ) : (
+                <StartChatIcon />
+              )}
+            </TouchableOpacity>
+          </ScreenWrapper>
+        {/* </View> */}
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
+  
 }
 
 const styles = StyleSheet.create({

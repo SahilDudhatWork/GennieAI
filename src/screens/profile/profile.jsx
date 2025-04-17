@@ -8,6 +8,9 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import {LogOutIcon, ProfileEditIcon} from '../../components/Icons';
@@ -134,123 +137,127 @@ function UpdateProfile({navigation}) {
   }, []);
   return (
     <>
-      <ScreenWrapper>
-        <ScrollView
-          style={styles.container}
-          showsVerticalScrollIndicator={false}>
-          <View>
-            <View style={styles.profileImageContainer}>
-              <View style={{position: 'relative'}}>
-                <Image
-                  source={require('../../assets/Images/profile-user.png')}
-                  style={styles.profileImage}
-                />
-                <TouchableOpacity
-                  style={styles.profileEditIcon}
-                  onPress={handleImagePick}>
-                  <ProfileEditIcon />
-                </TouchableOpacity>
-              </View>
-              <View>
-                <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
-                <Text style={styles.emailText}>{userDisplay?.email}</Text>
-                <TouchableOpacity
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    gap: 12,
-                    paddingTop: 7,
-                  }}
-                  activeOpacity={0.5}
-                  onPress={handleLogout}>
-                  <View style={styles.logOutIcon}>
-                    <LogOutIcon />
-                  </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{ flex: 1 }}>
+            <ScreenWrapper>
+              <ScrollView
+                style={styles.container}
+                contentContainerStyle={{ paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <View>
+                  <View style={styles.profileImageContainer}>
+                    <View style={{ position: 'relative' }}>
+                      <Image
+                        source={require('../../assets/Images/profile-user.png')}
+                        style={styles.profileImage}
+                      />
+                      <TouchableOpacity
+                        style={styles.profileEditIcon}
+                        onPress={handleImagePick}>
+                        <ProfileEditIcon />
+                      </TouchableOpacity>
+                    </View>
+                    <View>
+                      <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
+                      <Text style={styles.emailText}>{userDisplay?.email}</Text>
+                      <TouchableOpacity
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexDirection: 'row',
+                          gap: 12,
+                          paddingTop: 7,
+                        }}
+                        activeOpacity={0.5}
+                        onPress={handleLogout}>
+                        <View style={styles.logOutIcon}>
+                          <LogOutIcon />
+                        </View>
                   <Text style={styles.logOutText}>
                     {i18n.t('profilePage.logout')}
                   </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Name */}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+  
+                  {/* Name */}
             <View style={{paddingTop: 20}}>
               <Text style={styles.lableText}> {i18n.t('common.name')}</Text>
-              <TextInput
-                style={styles.inputStyle}
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterName')}
-                placeholderTextColor={Colors.darkGray}
-                autoCapitalize="none"
-                value={userData?.fullName}
-                onChangeText={text =>
-                  setUserData({...userData, fullName: text})
-                }
-              />
-            </View>
-            {validationErrors?.fullName && (
-              <Text style={styles.errorText}>{validationErrors?.fullName}</Text>
-            )}
-
-            {/* Email */}
+                      placeholderTextColor={Colors.darkGray}
+                      autoCapitalize="none"
+                      value={userData?.fullName}
+                      onChangeText={text =>
+                        setUserData({ ...userData, fullName: text })
+                      }
+                    />
+                  </View>
+                  {validationErrors?.fullName && (
+                    <Text style={styles.errorText}>
+                      {validationErrors?.fullName}
+                    </Text>
+                  )}
+  
+                  {/* Email */}
             <View style={{paddingTop: 10}}>
               <Text style={styles.lableText}>{i18n.t('common.email')}</Text>
-              <TextInput
-                style={styles.inputStyle}
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterEmail')}
-                placeholderTextColor={Colors.darkGray}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={userData?.email}
-                editable={false}
-              />
-            </View>
-
-            {/* Phone number */}
+                      placeholderTextColor={Colors.darkGray}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      value={userData?.email}
+                      editable={false}
+                    />
+                  </View>
+  
+                  {/* Phone number */}
             <View style={{paddingTop: 10}}>
               <Text style={styles.lableText}>
                 {i18n.t('common.phoneNumber')}
               </Text>
-              <TextInput
-                style={styles.inputStyle}
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterPhoneNumber')}
-                placeholderTextColor={Colors.darkGray}
-                autoCapitalize="none"
-                keyboardType="numeric"
-                value={userData.mobile} // Ensure mobile is defined
-                onChangeText={text => setUserData({...userData, mobile: text})}
-              />
-            </View>
-            {validationErrors?.mobile && (
-              <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
-            )}
-
-            {/* Password */}
-            {/* <View style={{paddingTop: 10}}>
-            <Text style={styles.lableText}>Password</Text>
-            <TextInput
-              style={styles.inputStyle}
-              placeholder="Enter your new password"
-              placeholderTextColor={Colors.darkGray}
-              secureTextEntry
-              autoCapitalize="none"
-              value={userData?.password}
-              editable={false}
-            />
-          </View> */}
-
-            <View>
-              <TouchableOpacity
-                style={styles.buttonNext}
-                onPress={handleUpdateProfile}>
+                      placeholderTextColor={Colors.darkGray}
+                      autoCapitalize="none"
+                      keyboardType="numeric"
+                      value={userData.mobile}
+                      onChangeText={text =>
+                        setUserData({ ...userData, mobile: text })
+                      }
+                    />
+                  </View>
+                  {validationErrors?.mobile && (
+                    <Text style={styles.errorText}>
+                      {validationErrors?.mobile}
+                    </Text>
+                  )}
+  
+                  {/* Update Button */}
+                  <View style={{ paddingTop: 20 }}>
+                    <TouchableOpacity
+                      style={styles.buttonNext}
+                      onPress={handleUpdateProfile}>
                 <Text style={styles.buttonText}>
                   {i18n.t('profilePage.updateProfile')}
                 </Text>
-              </TouchableOpacity>
-            </View>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ScrollView>
+            </ScreenWrapper>
           </View>
-        </ScrollView>
-      </ScreenWrapper>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+  
       {loading && (
         <View style={styles.loadingOverlay}>
           <DotIndicator color="#4A05ADCC" size={15} />
@@ -258,6 +265,7 @@ function UpdateProfile({navigation}) {
       )}
     </>
   );
+  
 }
 
 const styles = StyleSheet.create({

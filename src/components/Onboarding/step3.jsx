@@ -45,8 +45,9 @@ const Step3 = ({handleDownArrowStep3, handleSkipStep3}) => {
     'Gennie is a supportive AI companion for housewives, offering assistance, guidance, and smart solutions for daily tasks and personal growth';
   useEffect(() => {
     Tts.setDefaultLanguage('en-US');
+    Tts.setDefaultVoice('en-us-x-sfg#male_1-local');
     Tts.setDefaultRate(0.5);
-    Tts.setDefaultPitch(1.0);
+    Tts.setDefaultPitch(1.1);
     // Speak the subtitle text when the component mounts
     Tts.speak(text, {
       androidParams: {

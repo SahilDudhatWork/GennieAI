@@ -46,8 +46,9 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
     'Gennie is an AI mentor that empowers professionals with expert guidance, career insights, and skill development support.';
   useEffect(() => {
     Tts.setDefaultLanguage('en-US');
+    Tts.setDefaultVoice('en-us-x-sfg#male_1-local');
     Tts.setDefaultRate(0.5);
-    Tts.setDefaultPitch(1.0);
+    Tts.setDefaultPitch(1.1);
     // Speak the subtitle text when the component mounts
     Tts.speak(text, {
       androidParams: {

@@ -9,6 +9,9 @@ import {
   ScrollView,
   Platform,
   Alert,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import {FontFamily, Colors} from '../../../Utils/Themes';
 import ScreenWrapper from '../../components/ScreenWrapper';
@@ -281,163 +284,187 @@ function Signup({navigation}) {
 
   return (
     <>
-      <ScreenWrapper isSpecialBg={true}>
-        <ScrollView
-          style={styles.container}
-          showsVerticalScrollIndicator={false}>
-          <View>
-            <BackButton handleBackNext={handleBackNext} />
-          </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{ flex: 1 }}>
+            <ScreenWrapper isSpecialBg={true}>
+              <ScrollView
+                style={styles.container}
+                contentContainerStyle={{ paddingBottom: 40 }}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}>
+                <View>
+                  <BackButton handleBackNext={handleBackNext} />
+                </View>
           <View style={{paddingTop: 30}}>
             <Text style={styles.signUpText}>{i18n.t('signUpPage.signUp')}</Text>
-          </View>
-
-          {/* Name */}
+                </View>
+  
+                {/* Name */}
           <View style={{paddingTop: 20}}>
             <Text style={styles.lableText}>{i18n.t('common.name')}</Text>
-            <View style={styles.inputWrapper}>
-              <EmailIcon style={styles.iconStyle} />
-              <TextInput
-                style={styles.inputStyle}
+                  <View style={styles.inputWrapper}>
+                    <EmailIcon style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterName')}
-                placeholderTextColor="#575757"
-                autoCapitalize="none"
-                onChangeText={text =>
-                  setUserData({...userData, fullName: text})
-                }
-              />
-              {validationErrors?.fullName && (
-                <Text style={styles.errorText}>
-                  {validationErrors?.fullName}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          {/* Email */}
+                      placeholderTextColor="#575757"
+                      autoCapitalize="none"
+                      onChangeText={text =>
+                        setUserData({ ...userData, fullName: text })
+                      }
+                    />
+                  </View>
+                  {validationErrors?.fullName && (
+                    <Text style={styles.errorText}>
+                      {validationErrors?.fullName}
+                    </Text>
+                  )}
+                </View>
+  
+                {/* Email */}
           <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>{i18n.t('common.email')}</Text>
-            <View style={styles.inputWrapper}>
-              <EmailIcon style={styles.iconStyle} />
-              <TextInput
-                style={styles.inputStyle}
+                  <View style={styles.inputWrapper}>
+                    <EmailIcon style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterEmail')}
-                placeholderTextColor="#575757"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={text => setUserData({...userData, email: text})}
-              />
-              {validationErrors?.email && (
-                <Text style={styles.errorText}>{validationErrors?.email}</Text>
-              )}
-              {emailTaken != '' && (
-                <Text style={styles.errorText}>{emailTaken}</Text>
-              )}
-            </View>
-          </View>
-
+                      placeholderTextColor="#575757"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      onChangeText={text =>
+                        setUserData({ ...userData, email: text })
+                      }
+                    />
+                  </View>
+                  {validationErrors?.email && (
+                    <Text style={styles.errorText}>
+                      {validationErrors?.email}
+                    </Text>
+                  )}
+                  {emailTaken !== '' && (
+                    <Text style={styles.errorText}>{emailTaken}</Text>
+                  )}
+                </View>
+  
           {/* Phone number */}
           <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>{i18n.t('common.phoneNumber')}</Text>
-            <View style={styles.inputWrapper}>
-              <LockIcon style={styles.iconStyle} />
-              <TextInput
-                style={styles.inputStyle}
+                  <View style={styles.inputWrapper}>
+                    <LockIcon style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterPhoneNumber')}
-                placeholderTextColor="#575757"
-                autoCapitalize="none"
-                keyboardType="numeric"
-                onChangeText={text => setUserData({...userData, mobile: text})}
-              />
-
-              {validationErrors?.mobile && (
-                <Text style={styles.errorText}>{validationErrors?.mobile}</Text>
-              )}
-            </View>
-          </View>
-
-          {/* Password */}
+                      placeholderTextColor="#575757"
+                      autoCapitalize="none"
+                      keyboardType="numeric"
+                      onChangeText={text =>
+                        setUserData({ ...userData, mobile: text })
+                      }
+                    />
+                  </View>
+                  {validationErrors?.mobile && (
+                    <Text style={styles.errorText}>
+                      {validationErrors?.mobile}
+                    </Text>
+                  )}
+                </View>
+  
+                {/* Password */}
           <View style={{paddingTop: 10}}>
             <Text style={styles.lableText}>{i18n.t('common.password')}</Text>
-            <View style={styles.inputWrapper}>
-              <LockIcon style={styles.iconStyle} />
-              <TextInput
-                style={styles.inputStyle}
+                  <View style={styles.inputWrapper}>
+                    <LockIcon style={styles.iconStyle} />
+                    <TextInput
+                      style={styles.inputStyle}
                 placeholder={i18n.t('common.enterPassword')}
-                placeholderTextColor="#575757"
-                secureTextEntry
-                autoCapitalize="none"
-                onChangeText={text =>
-                  setUserData({...userData, password: text})
-                }
-              />
-              {validationErrors?.password && (
-                <Text style={styles.errorText}>
-                  {validationErrors?.password}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              style={styles.buttonSignUp}
-              onPress={handleSignUp}>
+                      placeholderTextColor="#575757"
+                      secureTextEntry
+                      autoCapitalize="none"
+                      onChangeText={text =>
+                        setUserData({ ...userData, password: text })
+                      }
+                    />
+                  </View>
+                  {validationErrors?.password && (
+                    <Text style={styles.errorText}>
+                      {validationErrors?.password}
+                    </Text>
+                  )}
+                </View>
+  
+                {/* Sign Up Button */}
+                <View style={{ paddingTop: 20 }}>
+                  <TouchableOpacity
+                    style={styles.buttonSignUp}
+                    onPress={handleSignUp}>
               <Text style={styles.buttonSigUpText}>
                 {i18n.t('signUpPage.signUp')}
               </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingTop: 20,
-            }}>
-            <View
-              style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
-            />
+                  </TouchableOpacity>
+                </View>
+  
+                {/* OR Divider */}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingTop: 20,
+                  }}>
+                  <View
+                    style={{ flex: 1, height: 1, backgroundColor: Colors.darkGray }}
+                  />
             <Text style={styles.orSignUpText}>
               {i18n.t('signUpPage.orSignUpWith')}
             </Text>
-            <View
-              style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
-            />
-          </View>
-          <View style={styles.signupOr}>
-            <TouchableOpacity onPress={handleGoogleLogin}>
-              <Image
-                source={require('../../assets/Images/auth/google.png')}
-                style={{width: 40, height: 40}}
-              />
-            </TouchableOpacity>
-            {Platform.OS === 'ios' && (
-              <TouchableOpacity onPress={handleAppleLogin}>
-                <Image
-                  source={require('../../assets/Images/auth/apple.png')}
-                  style={{width: 40, height: 40}}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={{paddingTop: 25, paddingBottom: 30}}>
-            <Text style={styles.accountText}>
+                  <View
+                    style={{ flex: 1, height: 1, backgroundColor: Colors.darkGray }}
+                  />
+                </View>
+  
+                {/* Social Logins */}
+                <View style={styles.signupOr}>
+                  <TouchableOpacity onPress={handleGoogleLogin}>
+                    <Image
+                      source={require('../../assets/Images/auth/google.png')}
+                      style={{ width: 40, height: 40 }}
+                    />
+                  </TouchableOpacity>
+                  {Platform.OS === 'ios' && (
+                    <TouchableOpacity onPress={handleAppleLogin}>
+                      <Image
+                        source={require('../../assets/Images/auth/apple.png')}
+                        style={{ width: 40, height: 40 }}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+  
+                {/* Navigation to Login */}
+                <View style={{ paddingTop: 25, paddingBottom: 30 }}>
+                  <Text style={styles.accountText}>
               {i18n.t('signUpPage.iHaveAnAccount')}?{' '}
-              <Text
-                style={{
-                  textDecorationLine: 'underline',
-                  color: Colors.deepViolet,
-                }}
+                    <Text
+                      style={{
+                        textDecorationLine: 'underline',
+                        color: Colors.deepViolet,
+                      }}
                 onPress={() => {
                   navigation.navigate('Login');
                 }}>
                 {i18n.t('common.login')}
-              </Text>
-            </Text>
+                    </Text>
+                  </Text>
+                </View>
+              </ScrollView>
+            </ScreenWrapper>
           </View>
-        </ScrollView>
-      </ScreenWrapper>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+  
       {loading && (
         <View style={styles.loadingOverlay}>
           <DotIndicator color="#4A05ADCC" size={15} />
@@ -445,6 +472,7 @@ function Signup({navigation}) {
       )}
     </>
   );
+  
 }
 
 const styles = StyleSheet.create({

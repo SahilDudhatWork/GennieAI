@@ -46,8 +46,9 @@ const Step4 = ({handleDownArrowStep4, handleSkipStep4}) => {
     'Gennie is a patient AI listener for elders, providing companionship, meaningful conversations, and thoughtful support';
   useEffect(() => {
     Tts.setDefaultLanguage('en-US');
+    Tts.setDefaultVoice('en-us-x-sfg#male_1-local');
     Tts.setDefaultRate(0.5);
-    Tts.setDefaultPitch(1.0);
+    Tts.setDefaultPitch(1.1);
     // Speak the subtitle text when the component mounts
     Tts.speak(text, {
       androidParams: {

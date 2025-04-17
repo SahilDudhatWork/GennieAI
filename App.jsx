@@ -56,52 +56,52 @@ function App() {
           <Stack.Screen
             name="Login"
             component={Login}
-            options={{headerShown: false}}
+            options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="Signup"
             component={Signup}
-            options={{headerShown: false}}
+             options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="ForgotPassword"
             component={ForgotPassword}
-            options={{headerShown: false}}
+             options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="OtpSent"
             component={OtpSent}
-            options={{headerShown: false}}
+             options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="CreatePassword"
             component={CreatePassword}
-            options={{headerShown: false}}
+             options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="Onboarding"
             component={Onboarding}
-            options={{headerShown: false}}
+             options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="SelectLanguage"
             component={SelectLanguage}
-            options={{headerShown: false}}
+             options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="Main"
             component={BottomTabs}
-            options={{headerShown: false}}
+            options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="TermsConditions"
             component={TermsConditions}
-            options={{headerShown: false}}
+              options={{headerShown: false,gestureEnabled: false}}
           />
           <Stack.Screen
             name="AboutUs"
             component={AboutUs}
-            options={{headerShown: false}}
+              options={{headerShown: false,gestureEnabled: false}}
           />
         </Stack.Navigator>
       </NavigationContainer>

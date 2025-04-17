@@ -10,6 +10,9 @@ import {
   Dimensions,
   Alert,
   Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import ScreenWrapper from '../../components/ScreenWrapper';
@@ -246,9 +249,16 @@ function Login({navigation}) {
 
   return (
     <>
+    <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={{ flex: 1 }}>
       <ScreenWrapper>
         <ScrollView
           style={styles.container}
+            contentContainerStyle={{ paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <View
             style={{
@@ -385,6 +395,9 @@ function Login({navigation}) {
           </View>
         </ScrollView>
       </ScreenWrapper>
+        </View>
+              </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
       {loading && (
         <View style={styles.loadingOverlay}>
           <DotIndicator color="#4A05ADCC" size={15} />
