@@ -24,6 +24,7 @@ import {DotIndicator} from 'react-native-indicators';
 import Config from '../../../config';
 import {EmailIcon, LockIcon} from '../../components/Icons';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
+import i18n from '../../localization/i18n';
 
 function Login({navigation}) {
   const [userData, setUserData] = useState({
@@ -50,16 +51,16 @@ function Login({navigation}) {
     setApiErrorMsg('');
 
     if (!userData?.email?.trim()) {
-      errors.email = 'Email is required.';
+      errors.email = i18n.t('common.emailIsRequired');
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       errors.email = emailRegex.test(userData.email)
         ? ''
-        : 'Invalid email format.';
+        : i18n.t('common.invalidEmailFormat');
     }
 
     if (!userData?.password?.trim()) {
-      errors.password = 'Password is required.';
+      errors.password = i18n.t('common.passwordIsRequired');
     } else {
       errors.password = '';
     }
@@ -149,9 +150,15 @@ function Login({navigation}) {
         console.log('Sign in is in progress');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('Play services not available');
-        Alert.alert('Error', 'Google Play Services are not available');
+        Alert.alert(
+          i18n.t('common.error'),
+          i18n.t('common.googlePlayServicesNotAvailable'),
+        );
       } else {
-        Alert.alert('Error', 'Something went wrong with Google Sign-In');
+        Alert.alert(
+          i18n.t('common.error'),
+          i18n.t('common.somethingWentWrongGoogle'),
+        );
       }
     }
   };
@@ -160,8 +167,8 @@ function Login({navigation}) {
     // Check if Apple Authentication is available (iOS 13+)
     if (!appleAuth.isSupported) {
       Alert.alert(
-        'Error',
-        'Apple Sign In is only available on iOS 13 and above',
+        i18n.t('common.error'),
+        i18n.t('common.appleSignOnlyAvailable'),
       );
       return;
     }
@@ -217,7 +224,7 @@ function Login({navigation}) {
             .finally(() => setLoading(false));
         }
       } else {
-        Alert.alert('Error', 'Apple Sign In failed');
+        Alert.alert(i18n.t('common.error'), i18n.t('common.appleSignFailed'));
       }
     } catch (error) {
       if (error.code === appleAuth.Error.CANCELED) {
@@ -226,7 +233,10 @@ function Login({navigation}) {
         console.error('Apple Sign-In Error:', error);
       }
       console.log('Error during Apple sign in:', error);
-      Alert.alert('Error', 'Something went wrong with Apple Sign-In');
+      Alert.alert(
+        i18n.t('common.error'),
+        i18n.t('common.somethingWentWrongApple'),
+      );
     }
   };
 
@@ -248,19 +258,21 @@ function Login({navigation}) {
               <BackButton handleBackNext={handleBackNext} />
             </View>
             <View style={styles.inputSeaction}>
-              <Text style={styles.loginTitleText}>Login</Text>
+              <Text style={styles.loginTitleText}>
+                {i18n.t('common.login')}
+              </Text>
               <Text style={styles.welcomeBackText}>
-                Welcome back to the app
+                {i18n.t('loginPage.welcomeBack')}
               </Text>
             </View>
             <View>
               <View style={styles.inputSeaction}>
-                <Text style={styles.lableText}>Email</Text>
+                <Text style={styles.lableText}> {i18n.t('common.email')}</Text>
                 <View style={styles.inputWrapper}>
                   <EmailIcon style={styles.iconStyle} />
                   <TextInput
                     style={styles.inputStyle}
-                    placeholder="Enter your email"
+                    placeholder={i18n.t('common.enterEmail')}
                     placeholderTextColor={Colors.darkGray}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -278,12 +290,15 @@ function Login({navigation}) {
               )}
               {/* Password */}
               <View style={{paddingTop: 10}}>
-                <Text style={styles.lableText}>Password</Text>
+                <Text style={styles.lableText}>
+                  {' '}
+                  {i18n.t('common.password')}
+                </Text>
                 <View style={styles.inputWrapper}>
                   <LockIcon style={styles.iconStyle} />
                   <TextInput
                     style={styles.inputStyle}
-                    placeholder="Enter your password"
+                    placeholder={i18n.t('common.enterPassword')}
                     placeholderTextColor={Colors.darkGray}
                     secureTextEntry
                     autoCapitalize="none"
@@ -304,21 +319,27 @@ function Login({navigation}) {
                     navigation.navigate('ForgotPassword');
                   }}
                   style={styles.forgotPasswordText}>
-                  Forgot Password?
+                  {i18n.t('common.forgotPassword')}?
                 </Text>
               </View>
 
               <TouchableOpacity
                 style={styles.buttonLogin}
                 onPress={handleLogin}>
-                <Text style={styles.buttonLoginText}>Login</Text>
+                <Text style={styles.buttonLoginText}>
+                  {' '}
+                  {i18n.t('common.login')}
+                </Text>
               </TouchableOpacity>
 
               <View style={styles.orSignContainer}>
                 <View
                   style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
                 />
-                <Text style={styles.orSignText}>Or sign in with</Text>
+                <Text style={styles.orSignText}>
+                  {' '}
+                  {i18n.t('loginPage.orSignInWith')}
+                </Text>
                 <View
                   style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
                 />
@@ -348,7 +369,7 @@ function Login({navigation}) {
                 width: '100%',
               }}>
               <Text style={styles.accountText}>
-                Don’t have an account?{' '}
+                {i18n.t('loginPage.dontHaveAccount')}?{' '}
                 <Text
                   style={{
                     textDecorationLine: 'underline',
@@ -357,7 +378,7 @@ function Login({navigation}) {
                   onPress={() => {
                     navigation.navigate('Signup');
                   }}>
-                  Create an account
+                  {i18n.t('loginPage.createCccount')}
                 </Text>
               </Text>
             </View>
@@ -478,10 +499,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 15,
-    paddingVertical: 15,
+    paddingVertical: 5,
   },
   inputSeaction: {
-    paddingTop: 40,
+    paddingTop: 25,
   },
   errorText: {
     color: Colors.darkRed,

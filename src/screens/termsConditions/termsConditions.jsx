@@ -17,6 +17,7 @@ import {WatchIcon} from '../../components/Icons';
 import RenderHtml from 'react-native-render-html';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../localization/i18n';
 
 function TermsConditions({navigation}) {
   const [termsData, setTermsData] = useState(null);
@@ -27,21 +28,20 @@ function TermsConditions({navigation}) {
   const slides = [
     {
       id: '1',
-      title: 'Security is our priority',
-      description:
-        'The App is a safe and convenient way to manage your account.',
+      title: i18n.t('termsConditionsPage.title1'),
+      description: i18n.t('termsConditionsPage.desc1'),
       image: require('../../assets/Images/slider1.webp'),
     },
     {
       id: '2',
-      title: 'Privacy is everything',
-      description: 'Your privacy is Important to us.',
+      title: i18n.t('termsConditionsPage.title2'),
+      description: i18n.t('termsConditionsPage.desc2'),
       image: require('../../assets/Images/slider2.webp'),
     },
     {
       id: '3',
-      title: 'Agree on safety',
-      description: 'Keeping your a account safe is a top priority',
+      title: i18n.t('termsConditionsPage.title3'),
+      description: i18n.t('termsConditionsPage.desc3'),
       image: require('../../assets/Images/slider3.webp'),
     },
   ];
@@ -54,23 +54,23 @@ function TermsConditions({navigation}) {
     navigation.goBack();
   };
   const fetchData = async () => {
-    setTermsData(
-      `<p>Welcome to Your App Name. By using our mobile application, you agree to comply with and be bound by the following Terms and Conditions. If you do not agree with these terms, please do not use the App.</p><p><strong>Acceptance of Terms</strong></p><p>By downloading, installing, and using the App, you agree to these Terms and our Privacy Policy. We reserve the right to update or modify these Terms at any time.</p><p><strong>1. Use of the App</strong></p><ul><li>You must be at least age years old to use the App.</li><li>You agree to use the App for lawful purposes only.</li><li>You are responsible for maintaining the confidentiality of your account credentials.</li></ul><p><strong>2. User Content</strong></p><ul><li>You retain ownership of any content you upload but grant us a license to use, modify, and distribute it as necessary for App functionality.</li><li>You must not upload illegal, harmful, or copyrighted content without permission.</li></ul><p><strong>3. Prohibited Activities</strong></p><ul><li>Engage in fraud, hacking, or other malicious activities.App.</li></ul>`,
-    );
-    setUpdatedAt('2025-04-15T09:27:37.983Z');
-    // try {
-    //   axios
-    //     .get('/v1/user/cms/term-and-conditions')
-    //     .then(async res => {
-    //       setTermsData(res.data.description);
-    //       setUpdatedAt(res.data.updatedAt);
-    //     })
-    //     .catch(error => {
-    //       console.log(error?.request, 'error?.request');
-    //     });
-    // } catch (error) {
-    //   console.error('Error retrieving user data:', error);
-    // }
+    // setTermsData(
+    //   `<p>Welcome to Your App Name. By using our mobile application, you agree to comply with and be bound by the following Terms and Conditions. If you do not agree with these terms, please do not use the App.</p><p><strong>Acceptance of Terms</strong></p><p>By downloading, installing, and using the App, you agree to these Terms and our Privacy Policy. We reserve the right to update or modify these Terms at any time.</p><p><strong>1. Use of the App</strong></p><ul><li>You must be at least age years old to use the App.</li><li>You agree to use the App for lawful purposes only.</li><li>You are responsible for maintaining the confidentiality of your account credentials.</li></ul><p><strong>2. User Content</strong></p><ul><li>You retain ownership of any content you upload but grant us a license to use, modify, and distribute it as necessary for App functionality.</li><li>You must not upload illegal, harmful, or copyrighted content without permission.</li></ul><p><strong>3. Prohibited Activities</strong></p><ul><li>Engage in fraud, hacking, or other malicious activities.App.</li></ul>`,
+    // );
+    // setUpdatedAt('2025-04-15T09:27:37.983Z');
+    try {
+      axios
+        .get('/v1/user/cms/term-and-conditions')
+        .then(async res => {
+          setTermsData(res.data.description);
+          setUpdatedAt(res.data.updatedAt);
+        })
+        .catch(error => {
+          console.log(error?.request, 'error?.request');
+        });
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+    }
   };
 
   const formatDate = dateString => {
@@ -98,11 +98,14 @@ function TermsConditions({navigation}) {
           <BackButton handleBackNext={handleBackNext} />
         </TouchableOpacity>
         <View style={styles.termsConditionsContainer}>
-          <Text style={styles.termsConditionsText}>Terms & Conditions</Text>
+          <Text style={styles.termsConditionsText}>
+            {i18n.t('termsConditionsPage.termsConditions')}
+          </Text>
           <View style={styles.timeContainer}>
             <WatchIcon />
             <Text style={styles.lastUpdateText}>
-              Last Updated: {updatedAt ? formatDate(updatedAt) : 'Loading...'}
+              {i18n.t('termsConditionsPage.lastUpdated')} :
+              {updatedAt ? formatDate(updatedAt) : i18n.t('common.loading')}
             </Text>
           </View>
         </View>
@@ -118,14 +121,16 @@ function TermsConditions({navigation}) {
                 source={{html: termsData}}
               />
             ) : (
-              <Text>Loading terms...</Text>
+              <Text>{i18n.t('termsConditionsPage.loadingTerms')}</Text>
             )}
           </ScrollView>
         </View>
 
         <View style={styles.bottomWrapper}>
           <TouchableOpacity style={styles.buttonIAgree} onPress={handleIAgree}>
-            <Text style={styles.buttonText}>I agree...</Text>
+            <Text style={styles.buttonText}>
+              {i18n.t('termsConditionsPage.iAgree')}
+            </Text>
           </TouchableOpacity>
 
           <View style={[styles.sliderContainer]}>
@@ -206,7 +211,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   newTextStyle: {
-    // maxHeight: Dimensions.get('window').height * 0.3,
     maxHeight: Dimensions.get('window').height - 430,
     width: '100%',
   },

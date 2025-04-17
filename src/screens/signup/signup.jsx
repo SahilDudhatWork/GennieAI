@@ -24,6 +24,7 @@ import {DotIndicator} from 'react-native-indicators';
 import Config from '../../../config';
 import {EmailIcon, LockIcon} from '../../components/Icons';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
+import i18n from '../../localization/i18n';
 
 function Signup({navigation}) {
   const [profileImage, setProfileImage] = useState(null);
@@ -63,36 +64,36 @@ function Signup({navigation}) {
     const errors = {};
     setEmailTaken('');
     if (userData.fullName.length < 3 || userData.fullName.length > 15) {
-      errors.fullName = 'name must be between 3 and 15 characters.';
+      errors.fullName = i18n.t('common.nameMustbe');
     } else {
       errors.fullName = '';
     }
 
     if (!userData.email.trim()) {
-      errors.email = 'Email is required.';
+      errors.email = errors.email = i18n.t('common.emailIsRequired');
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       errors.email = emailRegex.test(userData.email)
         ? ''
-        : 'Invalid email format.';
+        : i18n.t('common.invalidEmailFormat');
     }
     if (!userData.mobile.trim()) {
-      errors.mobile = 'Phone number is required.';
+      errors.mobile = i18n.t('common.phoneNumberIsRequired');
     } else {
-      const phoneRegex = /^[0-9]{10}$/; // Adjust as per your requirements
+      const phoneRegex = /^[0-9]{10}$/;
       errors.mobile = phoneRegex.test(userData.mobile)
         ? ''
-        : 'Invalid phone number format.';
+        : i18n.t('common.invalidPhoneNumberFormat');
     }
 
     if (userData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters.';
+      errors.password = i18n.t('common.passwordMustBe');
     } else {
       errors.password = '';
     }
 
     setValidationErrors(errors);
-
+    console.log('errors', errors);
     if (Object.values(errors).some(error => error !== '')) {
       return;
     }
@@ -178,9 +179,15 @@ function Signup({navigation}) {
         console.log('Sign in is in progress');
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         console.log('Play services not available');
-        Alert.alert('Error', 'Google Play Services are not available');
+        Alert.alert(
+          i18n.t('common.error'),
+          i18n.t('common.googlePlayServicesNotAvailable'),
+        );
       } else {
-        Alert.alert('Error', 'Something went wrong with Google Sign-In');
+        Alert.alert(
+          i18n.t('common.error'),
+          i18n.t('common.somethingWentWrongGoogle'),
+        );
       }
     }
   };
@@ -190,8 +197,8 @@ function Signup({navigation}) {
     // Check if Apple Authentication is available (iOS 13+)
     if (!appleAuth.isSupported) {
       Alert.alert(
-        'Error',
-        'Apple Sign In is only available on iOS 13 and above',
+        i18n.t('common.error'),
+        i18n.t('common.appleSignOnlyAvailable'),
       );
       return;
     }
@@ -252,7 +259,7 @@ function Signup({navigation}) {
             .finally(() => setLoading(false));
         }
       } else {
-        Alert.alert('Error', 'Apple Sign In failed');
+        Alert.alert(i18n.t('common.error'), i18n.t('common.appleSignFailed'));
       }
     } catch (error) {
       if (error.code === appleAuth.Error.CANCELED) {
@@ -261,7 +268,10 @@ function Signup({navigation}) {
         console.error('Apple Sign-In Error:', error);
       }
       console.log('Error during Apple sign in:', error);
-      Alert.alert('Error', 'Something went wrong with Apple Sign-In');
+      Alert.alert(
+        i18n.t('common.error'),
+        i18n.t('common.somethingWentWrongApple'),
+      );
     }
   };
 
@@ -279,17 +289,17 @@ function Signup({navigation}) {
             <BackButton handleBackNext={handleBackNext} />
           </View>
           <View style={{paddingTop: 30}}>
-            <Text style={styles.signUpText}>Sign up</Text>
+            <Text style={styles.signUpText}>{i18n.t('signUpPage.signUp')}</Text>
           </View>
 
           {/* Name */}
           <View style={{paddingTop: 20}}>
-            <Text style={styles.lableText}>Name</Text>
+            <Text style={styles.lableText}>{i18n.t('common.name')}</Text>
             <View style={styles.inputWrapper}>
               <EmailIcon style={styles.iconStyle} />
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your name"
+                placeholder={i18n.t('common.enterName')}
                 placeholderTextColor="#575757"
                 autoCapitalize="none"
                 onChangeText={text =>
@@ -306,12 +316,12 @@ function Signup({navigation}) {
 
           {/* Email */}
           <View style={{paddingTop: 10}}>
-            <Text style={styles.lableText}>Email</Text>
+            <Text style={styles.lableText}>{i18n.t('common.email')}</Text>
             <View style={styles.inputWrapper}>
               <EmailIcon style={styles.iconStyle} />
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your email"
+                placeholder={i18n.t('common.enterEmail')}
                 placeholderTextColor="#575757"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -328,12 +338,12 @@ function Signup({navigation}) {
 
           {/* Phone number */}
           <View style={{paddingTop: 10}}>
-            <Text style={styles.lableText}>Phone Number</Text>
+            <Text style={styles.lableText}>{i18n.t('common.phoneNumber')}</Text>
             <View style={styles.inputWrapper}>
               <LockIcon style={styles.iconStyle} />
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your number"
+                placeholder={i18n.t('common.enterPhoneNumber')}
                 placeholderTextColor="#575757"
                 autoCapitalize="none"
                 keyboardType="numeric"
@@ -348,12 +358,12 @@ function Signup({navigation}) {
 
           {/* Password */}
           <View style={{paddingTop: 10}}>
-            <Text style={styles.lableText}>Password</Text>
+            <Text style={styles.lableText}>{i18n.t('common.password')}</Text>
             <View style={styles.inputWrapper}>
               <LockIcon style={styles.iconStyle} />
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your password"
+                placeholder={i18n.t('common.enterPassword')}
                 placeholderTextColor="#575757"
                 secureTextEntry
                 autoCapitalize="none"
@@ -373,7 +383,9 @@ function Signup({navigation}) {
             <TouchableOpacity
               style={styles.buttonSignUp}
               onPress={handleSignUp}>
-              <Text style={styles.buttonSigUpText}>Sign up</Text>
+              <Text style={styles.buttonSigUpText}>
+                {i18n.t('signUpPage.signUp')}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -386,7 +398,9 @@ function Signup({navigation}) {
             <View
               style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
             />
-            <Text style={styles.orSignUpText}>Or sign up with</Text>
+            <Text style={styles.orSignUpText}>
+              {i18n.t('signUpPage.orSignUpWith')}
+            </Text>
             <View
               style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
             />
@@ -409,7 +423,7 @@ function Signup({navigation}) {
           </View>
           <View style={{paddingTop: 25, paddingBottom: 30}}>
             <Text style={styles.accountText}>
-              I have an account?{' '}
+              {i18n.t('signUpPage.iHaveAnAccount')}?{' '}
               <Text
                 style={{
                   textDecorationLine: 'underline',
@@ -418,7 +432,7 @@ function Signup({navigation}) {
                 onPress={() => {
                   navigation.navigate('Login');
                 }}>
-                Login
+                {i18n.t('common.login')}
               </Text>
             </Text>
           </View>

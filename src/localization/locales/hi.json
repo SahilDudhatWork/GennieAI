@@ -1,0 +1,123 @@
+{
+  "common": {
+    "email": "ईमेल",
+    "enterEmail": "अपना ईमेल दर्ज करें",
+    "password": "पासवर्ड",
+    "enterPassword": "अपना पासवर्ड दर्ज करें",
+    "name": "नाम",
+    "enterName": "अपना नाम दर्ज करें",
+    "phoneNumber": "फोन नंबर",
+    "enterPhoneNumber": "अपना नंबर दर्ज करें",
+    "emailIsRequired": "ईमेल आवश्यक है।",
+    "passwordIsRequired": "पासवर्ड आवश्यक है।",
+    "phoneNumberIsRequired": "फोन नंबर आवश्यक है।",
+    "invalidEmailFormat": "अमान्य ईमेल प्रारूप।",
+    "invalidPhoneNumberFormat": "अमान्य फोन नंबर प्रारूप।",
+    "nameMustbe": "नाम 3 से 15 अक्षरों के बीच होना चाहिए।",
+    "passwordMustBe": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।",
+    "forgotPassword": "पासवर्ड भूल गए",
+    "login": "लॉगिन",
+    "next": "आगे",
+    "loading": "लोड हो रहा है...",
+    "skip": "छोड़ें",
+    "error": "त्रुटि",
+    "googlePlayServicesNotAvailable": "Google Play सेवाएँ उपलब्ध नहीं हैं",
+    "somethingWentWrongGoogle": "Google साइन-इन में कुछ गलत हुआ",
+    "somethingWentWrongApple": "Apple साइन-इन में कुछ गलत हुआ",
+    "appleSignOnlyAvailable": "Apple साइन-इन केवल iOS 13 और उसके ऊपर के लिए उपलब्ध है",
+    "appleSignFailed": "Apple साइन-इन असफल रहा"
+  },
+
+  "selectLanguagePage": {
+    "selectYourLanguage": "अपनी भाषा चुनें"
+  },
+
+  "splashPage": {
+    "gennie": "जेनी",
+    "getStarted": "शुरू करें",
+    "signIn": "साइन इन करें"
+  },
+
+  "loginPage": {
+    "welcomeBack": "ऐप में आपका स्वागत है",
+    "orSignInWith": "या साइन इन करें",
+    "dontHaveAccount": "क्या आपके पास खाता नहीं है",
+    "createCccount": "खाता बनाएं"
+  },
+
+  "signUpPage": {
+    "signUp": "साइन अप करें",
+    "orSignUpWith": "या साइन अप करें",
+    "iHaveAnAccount": "मेरे पास खाता है"
+  },
+
+  "chatPage": {
+    "askWhatMind": "क्या मन में है पूछें",
+    "listening": "सुन रहा है...",
+    "processing": "प्रसंस्करण कर रहा है...",
+    "speaking": "बोल रहा है...",
+    "tapToTalk": "बात करने के लिए टैप करें",
+    "noInternetConnection": "इंटरनेट कनेक्शन नहीं है",
+    "checkInternetConnection": "कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।",
+    "failedStartSpeech": "स्पीच मान्यता प्रारंभ करने में विफल। कृपया पुनः प्रयास करें।",
+    "failedGotResponse": "प्रतिक्रिया प्राप्त करने में विफल। पुनः प्रयास करें।",
+    "permissionDenied": "अनुमति अस्वीकृत",
+    "microphonePermissionRequired": "माइक्रोफ़ोन अनुमति आवश्यक है।",
+    "networkError": "नेटवर्क त्रुटि",
+    "speechRecognitionError": "स्पीच मान्यता सेवा से कनेक्ट करने में समस्या हुई। पुनः प्रयास कर रहा है..."
+  },
+
+  "chatHistoryPage": {
+    "history": "इतिहास",
+    "noChatHistoryFound": "कोई चैट इतिहास नहीं मिला",
+    "failedToLoadHistory": "चैट इतिहास लोड करने में विफल।",
+    "yourChatHistoryEmpty": "आपका चैट इतिहास खाली है। इतिहास देखने के लिए अभी बातचीत शुरू करें!"
+  },
+
+  "createPasswordPage": {
+    "newPassword": "नया पासवर्ड",
+    "enterNewPassword": "अपना नया पासवर्ड दर्ज करें",
+    "reEnterPassword": "पासवर्ड फिर से दर्ज करें",
+    "enterReEnterPassword": "अपना पासवर्ड दोबारा दर्ज करें"
+  },
+
+  "otpSentPage": {
+    "otp": "ओटीपी",
+    "verifyOtp": "ओटीपी सत्यापित करें"
+  },
+
+  "profilePage": {
+    "logout": "लॉगआउट",
+    "updateProfile": "प्रोफ़ाइल अपडेट करें"
+  },
+
+  "termsConditionsPage": {
+    "termsConditions": "नियम और शर्तें",
+    "lastUpdated": "अंतिम अपडेट",
+    "loadingTerms": "नियम लोड हो रहे हैं...",
+    "iAgree": "मैं सहमत हूँ...",
+    "title1": "सुरक्षा हमारी प्राथमिकता है",
+    "desc1": "ऐप आपके खाते को प्रबंधित करने का एक सुरक्षित और सुविधाजनक तरीका है।",
+    "title2": "गोपनीयता सबसे महत्वपूर्ण है",
+    "desc2": "हम आपकी गोपनीयता का सम्मान करते हैं।",
+    "title3": "सुरक्षा पर सहमति दें",
+    "desc3": "आपके खाते की सुरक्षा हमारी सर्वोच्च प्राथमिकता है।"
+  },
+
+  "aboutUsPage": {
+    "aboutUs": "हमारे बारे में"
+  },
+
+  "onBordingPage": {
+    "profile": "प्रोफ़ाइल",
+    "chat": "चैट",
+    "gennieTitleStep1": "जेनी छात्रों के लिए \n शिक्षक है",
+    "gennieDescriptionStep1": "जेनी एक स्मार्ट एआई शिक्षक है जो छात्रों को व्यक्तिगत मार्गदर्शन और त्वरित समर्थन के साथ प्रभावी ढंग से सीखने में मदद करता है।",
+    "gennieTitleStep2": "जेनी पेशेवरों के लिए \n मार्गदर्शक है",
+    "gennieDescriptionStep2": "जेनी एक एआई मार्गदर्शक है जो पेशेवरों को विशेषज्ञ सलाह, करियर अंतर्दृष्टि और कौशल विकास में सहायता करता है।",
+    "gennieTitleStep3": "जेनी \n गृहिणियों के लिए सहायक \n साथी है",
+    "gennieDescriptionStep3": "जेनी गृहिणियों के लिए एक सहायक एआई साथी है, जो दैनिक कार्यों और व्यक्तिगत विकास के लिए सहायता और स्मार्ट समाधान प्रदान करता है।",
+    "gennieTitleStep4": "जेनी बुजुर्गों के लिए \n धैर्यपूर्वक सुनने वाला \n साथी है",
+    "gennieDescriptionStep4": "जेनी बुजुर्गों के लिए एक धैर्यशील एआई साथी है, जो साथ, सार्थक बातचीत और सोच-समझकर समर्थन प्रदान करता है।"
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "common": {
+    "email": "Email",
+    "enterEmail": "Enter your email",
+    "password": "Password",
+    "enterPassword": "Enter your password",
+    "name": "Name",
+    "enterName": "Enter your name",
+    "phoneNumber": "Phone Number",
+    "enterPhoneNumber": "Enter your number",
+    "emailIsRequired": "Email is required.",
+    "passwordIsRequired": "Password is required.",
+    "phoneNumberIsRequired": "Phone number is required.",
+    "invalidEmailFormat": "Invalid email format.",
+    "invalidPhoneNumberFormat": "Invalid phone number format.",
+    "nameMustbe": "name must be between 3 and 15 characters.",
+    "passwordMustBe": "Password must be at least 6 characters.",
+    "forgotPassword": "Forgot Password",
+    "login": "Login",
+    "next": "Next",
+    "loading": "Loading...",
+    "skip": "Skip",
+    "error": "Error",
+    "googlePlayServicesNotAvailable": "Google Play Services are not available",
+    "somethingWentWrongGoogle": "Something went wrong with Google Sign-In",
+    "somethingWentWrongApple": "Something went wrong with Apple Sign-In",
+    "appleSignOnlyAvailable": "Apple Sign In is only available on iOS 13 and above",
+    "appleSignFailed": "Apple Sign In failed"
+  },
+
+  "selectLanguagePage": {
+    "selectYourLanguage": "Select your Language"
+  },
+
+  "splashPage": {
+    "gennie": "Gennie",
+    "getStarted": "Get Started",
+    "signIn": "Sign In"
+  },
+
+  "loginPage": {
+    "welcomeBack": "Welcome back to the app",
+    "orSignInWith": "Or sign in with",
+    "dontHaveAccount": "Don’t have an account",
+    "createCccount": "Create an account"
+  },
+
+  "signUpPage": {
+    "signUp": "Sign up",
+    "orSignUpWith": "Or sign up with",
+    "iHaveAnAccount": "I have an account"
+  },
+
+  "chatPage": {
+    "askWhatMind": "Ask what's on mind",
+    "listening": "Listening...",
+    "processing": "Processing...",
+    "speaking": "Speaking...",
+    "tapToTalk": "Tap to Talk",
+    "noInternetConnection": "No Internet Connection",
+    "checkInternetConnection": "Please check your internet connection and try again.",
+    "failedStartSpeech": "Failed to start speech recognition. Please try again.",
+    "failedGotResponse": "Failed to get response. Try again.",
+    "permissionDenied": "Permission Denied",
+    "microphonePermissionRequired": "Microphone permission is required.",
+    "networkError": "Network Error",
+    "speechRecognitionError": "There was a problem connecting to the speech recognition service. Retrying..."
+  },
+
+  "chatHistoryPage": {
+    "history": "History",
+    "noChatHistoryFound": "No chat history found",
+    "failedToLoadHistory": "Failed to load chat history.",
+    "yourChatHistoryEmpty": "Your chat history is empty. Start a conversation now to see your history here!"
+  },
+
+  "createPasswordPage": {
+    "newPassword": "New Password",
+    "enterNewPassword": "Enter your new password",
+    "reEnterPassword": "Re-enter Password",
+    "enterReEnterPassword": "Enter your re-enter password"
+  },
+
+  "otpSentPage": {
+    "otp": "Otp",
+    "verifyOtp": "Verify Otp"
+  },
+
+  "profilePage": {
+    "logout": "logout",
+    "updateProfile": "Update Profile"
+  },
+
+  "termsConditionsPage": {
+    "termsConditions": "Terms & Conditions",
+    "lastUpdated": "Last Updated",
+    "loadingTerms": "Loading terms...",
+    "iAgree": "I agree...",
+    "title1": "Security is our priority",
+    "desc1": "The App is a safe and convenient way to manage your account.",
+    "title2": "Privacy is everything",
+    "desc2": "Your privacy is important to us.",
+    "title3": "Agree on safety",
+    "desc3": "Keeping your account safe is a top priority"
+  },
+
+  "aboutUsPage": {
+    "aboutUs": "About Us"
+  },
+
+  "onBordingPage": {
+    "profile": "Profile",
+    "chat": "Chat",
+    "gennieTitleStep1": "Gennie is tutor for\n Students",
+    "gennieDescriptionStep1": "Gennie is a smart AI tutor designed to help students learn efficiently with personalized guidance and instant support.",
+    "gennieTitleStep2": "Gennie is Mentor \n for Professionals",
+    "gennieDescriptionStep2": "Gennie is an AI mentor that empowers professionals with expert guidance, career insights, and skill development support.",
+    "gennieTitleStep3": "Gennie is Supportive \n Companion for \n Housewives",
+    "gennieDescriptionStep3": "Gennie is a supportive AI companion for housewives, offering assistance, guidance, and smart solutions for daily tasks and personal growth",
+    "gennieTitleStep4": " Gennie is Patient \n Listener for Elders",
+    "gennieDescriptionStep4": "Gennie is a patient AI listener for elders, providing companionship, meaningful conversations, and thoughtful support"
+  }
+}

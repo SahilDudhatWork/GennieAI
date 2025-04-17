@@ -14,6 +14,7 @@ import {Colors, FontFamily} from '../../../Utils/Themes';
 import * as Animatable from 'react-native-animatable';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
+import i18n from '../../localization/i18n';
 
 const {width, height} = Dimensions.get('window');
 
@@ -80,7 +81,7 @@ const Step3 = ({handleDownArrowStep3, handleSkipStep3}) => {
             style={styles.skipText}
             animation="fadeInRight"
             duration={500}>
-            Skip
+            {i18n.t('common.skip')}
           </Animatable.Text>
         </TouchableOpacity>
       </View>
@@ -164,7 +165,7 @@ const Step3 = ({handleDownArrowStep3, handleSkipStep3}) => {
         animation="fadeInLeft"
         duration={500}
         style={styles.title}>
-        Gennie is Supportive {'\n'} Companion for {'\n'}Housewives
+        {i18n.t('onBordingPage.gennieTitleStep3')}
       </Animatable.Text>
 
       <Animatable.Text
@@ -172,8 +173,7 @@ const Step3 = ({handleDownArrowStep3, handleSkipStep3}) => {
         animation="fadeInRight"
         delay={300}
         duration={500}>
-        Gennie is a supportive AI companion for housewives, offering assistance,
-        guidance, and smart solutions for daily tasks and personal growth
+        {i18n.t('onBordingPage.gennieDescriptionStep3')}
       </Animatable.Text>
 
       <Animatable.View
@@ -232,10 +232,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: Platform.OS === 'ios' ? 0 : 10,
+    zIndex: 99,
   },
   skipText: {
-    color: Colors.white,
+    color: Colors.deepViolet,
     fontSize: 16,
     fontWeight: '700',
     fontFamily: FontFamily.SpaceGrotesk,

@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -10,67 +10,45 @@ import ScreenWrapper from '../../components/ScreenWrapper';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import DropDownPicker from 'react-native-dropdown-picker';
 import BackButton from '../../components/BackButton';
-import langs from 'langs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// import CountryPicker from 'react-native-country-picker-modal';
 import CountryFlag from 'react-native-country-flag';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n, {setI18nConfig} from '../../localization/i18n';
 
 const Height = Dimensions.get('window').height;
 
 function SelectLanguage({navigation}) {
   const [open, setOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
-  // const [countryCode, setCountryCode] = useState('US');
+  const [languageUpdated, setLanguageUpdated] = useState(false);
+
+  useEffect(() => {
+    const loadLanguage = async () => {
+      const savedLang = await AsyncStorage.getItem('appLanguage');
+      if (savedLang) {
+        setSelectedLanguage(savedLang);
+        await setI18nConfig(savedLang);
+        setLanguageUpdated(prev => !prev);
+      }
+    };
+    loadLanguage();
+  }, []);
 
   const handleNext = async () => {
     const isLanguage = await AsyncStorage.getItem('isLanguage');
     if (!isLanguage) {
       await AsyncStorage.setItem('isLanguage', 'true');
     }
+    await AsyncStorage.setItem('appLanguage', selectedLanguage);
+    setI18nConfig(selectedLanguage);
     navigation.replace('TermsConditions');
   };
 
-  // const languageOptions = useMemo(() => {
-  //   return langs
-  //     .names()
-  //     .map(name => {
-  //       const lang = langs.where('name', name);
-  //       if (!lang) return null;
-
-  //       const languageCode = lang['1'];
-  //       return {
-  //         label: name,
-  //         value: languageCode,
-  //       };
-  //     })
-  //     .filter(Boolean);
-  // }, []);
-
-  // const languageOptions = useMemo(() => {
-  //   return langs
-  //     .names()
-  //     .map(name => {
-  //       const lang = langs.where('name', name);
-  //       if (!lang) return null;
-
-  //       const languageCode = lang['1'];
-
-  //       return {
-  //         label: (
-  //           <View style={styles.languageItem}>
-  //             <CountryFlag
-  //               isoCode={languageCode}
-  //               size={25}
-  //               style={styles.flag}
-  //             />
-  //             <Text style={styles.languageText}>{name}</Text>
-  //           </View>
-  //         ),
-  //         value: languageCode,
-  //       };
-  //     })
-  //     .filter(Boolean);
-  // }, []);
+  const onLanguageChange = async val => {
+    setSelectedLanguage(val);
+    await AsyncStorage.setItem('appLanguage', val);
+    await setI18nConfig(val);
+    setLanguageUpdated(prev => !prev);
+  };
 
   const languageOptions = useMemo(() => {
     const options = [
@@ -95,18 +73,18 @@ function SelectLanguage({navigation}) {
     }));
   }, []);
 
-  const handleBackNext = () => {
-    navigation.goBack();
-  };
-
   return (
     <ScreenWrapper style={styles.container}>
       <View>
-        <BackButton handleBackNext={handleBackNext} />
+        <BackButton handleBackNext={() => navigation.goBack()} />
       </View>
+
       <View style={{paddingTop: 80}}>
-        <Text style={styles.selectLanguageText}>Select your Language</Text>
+        <Text style={styles.selectLanguageText}>
+          {i18n.t('selectLanguagePage.selectYourLanguage')}
+        </Text>
       </View>
+
       <View style={{paddingTop: 20}}>
         <DropDownPicker
           open={open}
@@ -114,6 +92,7 @@ function SelectLanguage({navigation}) {
           items={languageOptions}
           setOpen={setOpen}
           setValue={setSelectedLanguage}
+          onChangeValue={onLanguageChange}
           placeholder="Choose a language..."
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropdownContainer}
@@ -126,7 +105,7 @@ function SelectLanguage({navigation}) {
       </View>
 
       <TouchableOpacity style={styles.buttonNext} onPress={handleNext}>
-        <Text style={styles.buttonNextText}>Next</Text>
+        <Text style={styles.buttonNextText}>{i18n.t('common.next')}</Text>
       </TouchableOpacity>
     </ScreenWrapper>
   );

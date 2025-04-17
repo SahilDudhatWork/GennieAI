@@ -14,6 +14,7 @@ import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
+import i18n from '../../localization/i18n';
 
 const {width, height} = Dimensions.get('window');
 
@@ -42,10 +43,14 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
   const text =
     'Gennie is a smart AI tutor designed to help students learn efficiently with personalized guidance and instant support';
   useEffect(() => {
+    // Tts.setDefaultLanguage('en-US');
+    // Tts.setDefaultRate(0.5);
+    // Tts.setDefaultPitch(1.0);
+    //
     Tts.setDefaultLanguage('en-US');
+    Tts.setDefaultVoice('en-us-x-sfg#male_1-local');
     Tts.setDefaultRate(0.5);
-    Tts.setDefaultPitch(1.0);
-    // Speak the subtitle text when the component mounts
+    Tts.setDefaultPitch(1.1);
     Tts.speak(text, {
       androidParams: {
         KEY_PARAM_PAN: 0,
@@ -79,7 +84,7 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
             animation="fadeInRight"
             duration={500}
             style={styles.skipText}>
-            Skip
+            {i18n.t('common.skip')}
           </Animatable.Text>
         </TouchableOpacity>
       </View>
@@ -156,7 +161,7 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
         animation="fadeInLeft"
         duration={500}
         style={styles.title}>
-        Gennie is tutor for{'\n'}Students
+        {i18n.t('onBordingPage.gennieTitleStep1')}
       </Animatable.Text>
 
       <Animatable.Text
@@ -164,8 +169,7 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
         delay={300}
         duration={500}
         style={styles.subtitle}>
-        Gennie is a smart AI tutor designed to help students learn efficiently
-        with personalized guidance and instant support.
+        {i18n.t('onBordingPage.gennieDescriptionStep1')}
       </Animatable.Text>
 
       <Animatable.View
@@ -224,10 +228,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: Platform.OS === 'ios' ? 0 : 10,
+    zIndex: 99,
   },
   skipText: {
-    color: Colors.white,
+    color: Colors.deepViolet,
     fontSize: 16,
     fontWeight: '700',
     fontFamily: FontFamily.TimeRoman,

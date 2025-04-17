@@ -15,6 +15,7 @@ import {Colors, FontFamily} from '../../../Utils/Themes';
 import * as Animatable from 'react-native-animatable';
 import Tts from 'react-native-tts';
 import {useNavigation} from '@react-navigation/native';
+import i18n from '../../localization/i18n';
 
 const {width, height} = Dimensions.get('window');
 
@@ -75,7 +76,7 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
             style={styles.skipText}
             animation="fadeInRight"
             duration={500}>
-            Skip
+            {i18n.t('common.skip')}
           </Animatable.Text>
         </TouchableOpacity>
       </View>
@@ -151,7 +152,7 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
         style={styles.title}
         animation="fadeInLeft"
         duration={500}>
-        Gennie is Mentor {'\n'}for Professionals
+        {i18n.t('onBordingPage.gennieTitleStep2')}
       </Animatable.Text>
 
       <Animatable.Text
@@ -159,8 +160,7 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
         animation="fadeInRight"
         delay={300}
         duration={500}>
-        Gennie is an AI mentor that empowers professionals with expert guidance,
-        career insights, and skill development support.
+        {i18n.t('onBordingPage.gennieDescriptionStep2')}
       </Animatable.Text>
 
       <Animatable.View
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: Platform.OS === 'ios' ? 0 : 10,
     zIndex: 99,
   },
   skipText: {

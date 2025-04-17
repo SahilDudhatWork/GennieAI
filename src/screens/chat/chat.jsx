@@ -32,6 +32,7 @@ import LottieView from 'lottie-react-native';
 import {LinearGradient} from 'react-native-linear-gradient';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import BackButton from '../../components/BackButton';
+import i18n from '../../localization/i18n';
 
 function Chat({navigation}) {
   const [showInput, setShowInput] = useState(false);
@@ -205,8 +206,8 @@ function Chat({navigation}) {
         const isConnected = await checkNetworkConnectivity();
         if (isConnected) {
           Alert.alert(
-            'Network Error',
-            'There was a problem connecting to the speech recognition service. Retrying...',
+            i18n.t('networkError'),
+            i18n.t('speechRecognitionError'),
             [
               {
                 text: 'OK',
@@ -219,8 +220,8 @@ function Chat({navigation}) {
           );
         } else {
           Alert.alert(
-            'No Internet Connection',
-            'Please check your internet connection and try again.',
+            i18n.t('chatPage.noInternetConnection'),
+            i18n.t('chatPage.checkInternetConnection'),
           );
         }
       } else {
@@ -358,7 +359,8 @@ function Chat({navigation}) {
       return aiResponse;
     } catch (error) {
       console.error('Error fetching AI response:', error.request);
-      Alert.alert('Error', 'Failed to get response. Try again.');
+      Alert.alert(i18n.t('common.error'), i18n.t('common.failedGotResponse'));
+
       return null;
     } finally {
       isRespondingRef.current = false;
@@ -402,15 +404,18 @@ function Chat({navigation}) {
 
       const hasPermission = await requestMicrophonePermission();
       if (!hasPermission) {
-        Alert.alert('Permission Denied', 'Microphone permission is required.');
+        Alert.alert(
+          i18n.t('chatPage.permissionDenied'),
+          i18n.t('chatPage.microphonePermissionRequired'),
+        );
         return;
       }
 
       const isConnected = await checkNetworkConnectivity();
       if (!isConnected) {
         Alert.alert(
-          'No Internet Connection',
-          'Please check your internet connection and try again.',
+          i18n.t('chatPage.noInternetConnection'),
+          i18n.t('chatPage.checkInternetConnection'),
         );
         return;
       }
@@ -424,10 +429,7 @@ function Chat({navigation}) {
     } catch (error) {
       console.error('Error starting speech recognition:', error);
       setIsListening(false);
-      Alert.alert(
-        'Error',
-        'Failed to start speech recognition. Please try again.',
-      );
+      Alert.alert(i18n.t('common.error'), i18n.t('chatPage.failedStartSpeech'));
     }
   };
 
@@ -491,8 +493,8 @@ function Chat({navigation}) {
 
       if (!Array.isArray(storedChatArray)) {
         Alert.alert(
-          'No Chat History',
-          'Your chat history is empty. Start a conversation now to see your history here!',
+          i18n.t('chatHistoryPage.noChatHistoryFound'),
+          i18n.t('chatHistoryPage.yourChatHistoryEmpty'),
         );
         return;
       }
@@ -604,12 +606,12 @@ function Chat({navigation}) {
           {!showInput && !showChatBubble && (
             <Text style={styles.talkText}>
               {isListening
-                ? 'Listening...'
+                ? i18n.t('chatPage.listening')
                 : isResponding
-                ? 'Processing...'
+                ? i18n.t('chatPage.processing')
                 : isSpeaking
-                ? 'Speaking...'
-                : 'Tap to Talk'}
+                ? i18n.t('chatPage.speaking')
+                : i18n.t('chatPage.tapToTalk')}
             </Text>
           )}
 
@@ -682,7 +684,7 @@ function Chat({navigation}) {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Ask what's on mind"
+                placeholder={i18n.t('chatPage.askWhatMind')}
                 placeholderTextColor="#5A5A5A"
                 autoCapitalize="none"
                 value={chatText}

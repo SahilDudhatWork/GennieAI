@@ -16,6 +16,7 @@ import axios from '../../../axios';
 import {DotIndicator} from 'react-native-indicators';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import i18n from '../../localization/i18n';
 
 function UpdateProfile({navigation}) {
   const [loading, setLoading] = useState(false);
@@ -92,18 +93,18 @@ function UpdateProfile({navigation}) {
   const handleUpdateProfile = async () => {
     const errors = {};
     if (userData.fullName.length < 3 || userData.fullName.length > 15) {
-      errors.fullName = 'name must be between 3 and 15 characters.';
+      errors.fullName = i18n.t('common.nameMustbe');
     } else {
       errors.fullName = '';
     }
 
     if (!userData.mobile.trim()) {
-      errors.mobile = 'Phone number is required.';
+      errors.mobile = i18n.t('common.phoneNumberIsRequired');
     } else {
       const phoneRegex = /^[0-9]{10}$/;
       errors.mobile = phoneRegex.test(userData.mobile)
         ? ''
-        : 'Invalid phone number format.';
+        : i18n.t('common.invalidPhoneNumberFormat');
     }
 
     setValidationErrors(errors);
@@ -166,17 +167,19 @@ function UpdateProfile({navigation}) {
                   <View style={styles.logOutIcon}>
                     <LogOutIcon />
                   </View>
-                  <Text style={styles.logOutText}>Log out</Text>
+                  <Text style={styles.logOutText}>
+                    {i18n.t('profilePage.logout')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
 
             {/* Name */}
             <View style={{paddingTop: 20}}>
-              <Text style={styles.lableText}>Name</Text>
+              <Text style={styles.lableText}> {i18n.t('common.name')}</Text>
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your name"
+                placeholder={i18n.t('common.enterName')}
                 placeholderTextColor={Colors.darkGray}
                 autoCapitalize="none"
                 value={userData?.fullName}
@@ -191,10 +194,10 @@ function UpdateProfile({navigation}) {
 
             {/* Email */}
             <View style={{paddingTop: 10}}>
-              <Text style={styles.lableText}>Email</Text>
+              <Text style={styles.lableText}>{i18n.t('common.email')}</Text>
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your email"
+                placeholder={i18n.t('common.enterEmail')}
                 placeholderTextColor={Colors.darkGray}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -205,10 +208,12 @@ function UpdateProfile({navigation}) {
 
             {/* Phone number */}
             <View style={{paddingTop: 10}}>
-              <Text style={styles.lableText}>Phone Number</Text>
+              <Text style={styles.lableText}>
+                {i18n.t('common.phoneNumber')}
+              </Text>
               <TextInput
                 style={styles.inputStyle}
-                placeholder="Enter your number"
+                placeholder={i18n.t('common.enterPhoneNumber')}
                 placeholderTextColor={Colors.darkGray}
                 autoCapitalize="none"
                 keyboardType="numeric"
@@ -238,7 +243,9 @@ function UpdateProfile({navigation}) {
               <TouchableOpacity
                 style={styles.buttonNext}
                 onPress={handleUpdateProfile}>
-                <Text style={styles.buttonText}>Update Profile</Text>
+                <Text style={styles.buttonText}>
+                  {i18n.t('profilePage.updateProfile')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

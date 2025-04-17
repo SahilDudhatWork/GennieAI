@@ -12,6 +12,7 @@ import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../localization/i18n';
 
 function OtpSent({navigation}) {
   const Height = Dimensions.get('window').height;
@@ -121,7 +122,7 @@ function OtpSent({navigation}) {
           <BackButton handleBackNext={handleBackNext} />
         </View>
         <View style={styles.inputSeaction}>
-          <Text style={styles.otpText}>Otp</Text>
+          <Text style={styles.otpText}>{i18n.t('otpSentPage.otp')}</Text>
         </View>
 
         <View style={styles.otpContainer}>
@@ -158,7 +159,9 @@ function OtpSent({navigation}) {
             ]}
             disabled={!otp.every(num => num !== '')}
             onPress={verifyOtp}>
-            <Text style={styles.buttonText}>Verify Otp</Text>
+            <Text style={styles.buttonText}>
+              {i18n.t('otpSentPage.verifyOtp')}
+            </Text>
           </TouchableOpacity>
         </View>
 

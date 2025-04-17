@@ -1,6 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import ScreenWrapper from '../../components/ScreenWrapper';
-import {StyleSheet, Text, View, TouchableOpacity, FlatList} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import {
   MessageIcon,
@@ -10,6 +17,7 @@ import {
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import {BlurView} from '@react-native-community/blur';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../localization/i18n';
 
 function ChatHistory({navigation}) {
   const [chatHistory, setChatHistory] = useState([]);
@@ -56,8 +64,8 @@ function ChatHistory({navigation}) {
       let storedChatArray = storedMessages ? JSON.parse(storedMessages) : [];
       if (storedChatArray.length === 0) {
         Alert.alert(
-          'No Chat History',
-          'Your chat history is empty. Start a conversation now to see your history here!',
+          i18n.t('chatHistoryPage.noChatHistoryFound'),
+          i18n.t('chatHistoryPage.yourChatHistoryEmpty'),
         );
         return;
       }
@@ -87,7 +95,10 @@ function ChatHistory({navigation}) {
       setChatHistory(groupedChats);
     } catch (error) {
       console.error('Error fetching chat messages:', error);
-      Alert.alert('Error', 'Failed to load chat history.');
+      Alert.alert(
+        i18n.t('common.error'),
+        i18n.t('chatHistoryPage.failedToLoadHistory'),
+      );
     }
   };
 
@@ -95,7 +106,9 @@ function ChatHistory({navigation}) {
     <ScreenWrapper style={{padding: 0}} isSpecialBg={true}>
       <View style={styles.container}>
         <View style={styles.historyContainer}>
-          <Text style={styles.historyText}>History</Text>
+          <Text style={styles.historyText}>
+            {i18n.t('chatHistoryPage.history')}
+          </Text>
         </View>
         <BlurView
           style={styles.drawerBlur}
@@ -105,7 +118,9 @@ function ChatHistory({navigation}) {
           <View style={styles.drawer}>
             {Object.keys(chatHistory).length === 0 ? (
               <View style={styles.noHistoryContainer}>
-                <Text style={styles.noHistoryText}>No chat history found</Text>
+                <Text style={styles.noHistoryText}>
+                  {i18n.t('chatHistoryPage.noChatHistoryFound')}
+                </Text>
               </View>
             ) : (
               <FlatList

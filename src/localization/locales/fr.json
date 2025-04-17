@@ -1,0 +1,123 @@
+{
+  "common": {
+    "email": "E-mail",
+    "enterEmail": "Entrez votre e-mail",
+    "password": "Mot de passe",
+    "enterPassword": "Entrez votre mot de passe",
+    "name": "Nom",
+    "enterName": "Entrez votre nom",
+    "phoneNumber": "Numéro de téléphone",
+    "enterPhoneNumber": "Entrez votre numéro",
+    "emailIsRequired": "L'e-mail est requis.",
+    "passwordIsRequired": "Le mot de passe est requis.",
+    "phoneNumberIsRequired": "Le numéro de téléphone est requis.",
+    "invalidEmailFormat": "Format d'e-mail invalide.",
+    "invalidPhoneNumberFormat": "Format de numéro de téléphone invalide.",
+    "nameMustbe": "Le nom doit contenir entre 3 et 15 caractères.",
+    "passwordMustBe": "Le mot de passe doit contenir au moins 6 caractères.",
+    "forgotPassword": "Mot de passe oublié",
+    "login": "Connexion",
+    "next": "Suivant",
+    "loading": "Chargement...",
+    "skip": "Passer",
+    "error": "Erreur",
+    "googlePlayServicesNotAvailable": "Les services Google Play ne sont pas disponibles",
+    "somethingWentWrongGoogle": "Une erreur s'est produite lors de la connexion Google",
+    "somethingWentWrongApple": "Une erreur s'est produite lors de la connexion Apple",
+    "appleSignOnlyAvailable": "La connexion Apple est disponible uniquement sur iOS 13 et plus",
+    "appleSignFailed": "Échec de la connexion Apple"
+  },
+
+  "selectLanguagePage": {
+    "selectYourLanguage": "Sélectionnez votre langue"
+  },
+
+  "splashPage": {
+    "gennie": "Gennie",
+    "getStarted": "Commencer",
+    "signIn": "Se connecter"
+  },
+
+  "loginPage": {
+    "welcomeBack": "Bon retour sur l'application",
+    "orSignInWith": "Ou connectez-vous avec",
+    "dontHaveAccount": "Vous n'avez pas de compte",
+    "createCccount": "Créer un compte"
+  },
+
+  "signUpPage": {
+    "signUp": "S'inscrire",
+    "orSignUpWith": "Ou inscrivez-vous avec",
+    "iHaveAnAccount": "J'ai déjà un compte"
+  },
+
+  "chatPage": {
+    "askWhatMind": "Exprimez ce que vous avez en tête",
+    "listening": "Écoute...",
+    "processing": "Traitement...",
+    "speaking": "Parle...",
+    "tapToTalk": "Appuyez pour parler",
+    "noInternetConnection": "Pas de connexion Internet",
+    "checkInternetConnection": "Veuillez vérifier votre connexion Internet et réessayer.",
+    "failedStartSpeech": "Échec du démarrage de la reconnaissance vocale. Veuillez réessayer.",
+    "failedGotResponse": "Échec de la réponse. Veuillez réessayer.",
+    "permissionDenied": "Permission refusée",
+    "microphonePermissionRequired": "L'autorisation du microphone est requise.",
+    "networkError": "Erreur réseau",
+    "speechRecognitionError": "Un problème est survenu avec le service de reconnaissance vocale. Nouvelle tentative en cours..."
+  },
+
+  "chatHistoryPage": {
+    "history": "Historique",
+    "noChatHistoryFound": "Aucun historique de discussion trouvé",
+    "failedToLoadHistory": "Échec du chargement de l'historique.",
+    "yourChatHistoryEmpty": "Votre historique de discussion est vide. Commencez une conversation maintenant pour voir votre historique ici !"
+  },
+
+  "createPasswordPage": {
+    "newPassword": "Nouveau mot de passe",
+    "enterNewPassword": "Entrez votre nouveau mot de passe",
+    "reEnterPassword": "Confirmer le mot de passe",
+    "enterReEnterPassword": "Confirmez votre mot de passe"
+  },
+
+  "otpSentPage": {
+    "otp": "Code",
+    "verifyOtp": "Vérifier le code"
+  },
+
+  "profilePage": {
+    "logout": "Déconnexion",
+    "updateProfile": "Mettre à jour le profil"
+  },
+
+  "termsConditionsPage": {
+    "termsConditions": "Termes et conditions",
+    "lastUpdated": "Dernière mise à jour",
+    "loadingTerms": "Chargement des conditions...",
+    "iAgree": "Je suis d'accord...",
+    "title1": "La sécurité est notre priorité",
+    "desc1": "L'application est un moyen sûr et pratique de gérer votre compte.",
+    "title2": "La vie privée est primordiale",
+    "desc2": "Votre vie privée est importante pour nous.",
+    "title3": "Accord sur la sécurité",
+    "desc3": "La sécurité de votre compte est une priorité absolue."
+  },
+
+  "aboutUsPage": {
+    "aboutUs": "À propos de nous"
+  },
+
+  "onBordingPage": {
+    "profile": "Profil",
+    "chat": "Discussion",
+    "gennieTitleStep1": "Gennie est un tuteur pour\n les étudiants",
+    "gennieDescriptionStep1": "Gennie est un tuteur IA intelligent conçu pour aider les étudiants à apprendre efficacement avec des conseils personnalisés et un soutien instantané.",
+    "gennieTitleStep2": "Gennie est un mentor \n pour les professionnels",
+    "gennieDescriptionStep2": "Gennie est un mentor IA qui accompagne les professionnels avec des conseils d'experts, des perspectives de carrière et un soutien au développement des compétences.",
+    "gennieTitleStep3": "Gennie est un compagnon \n de soutien pour \n les femmes au foyer",
+    "gennieDescriptionStep3": "Gennie est un compagnon IA de soutien pour les femmes au foyer, offrant de l'aide, des conseils et des solutions intelligentes pour les tâches quotidiennes et le développement personnel.",
+    "gennieTitleStep4": "Gennie est une oreille \n attentive pour les aînés",
+    "gennieDescriptionStep4": "Gennie est une IA attentive pour les personnes âgées, offrant de la compagnie, des conversations significatives et un soutien bienveillant."
+  }
+}

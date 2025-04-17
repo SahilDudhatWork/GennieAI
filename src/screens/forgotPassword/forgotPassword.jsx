@@ -12,6 +12,7 @@ import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../localization/i18n';
 
 function ForgetPassword({navigation}) {
   const Height = Dimensions.get('window').height;
@@ -64,14 +65,16 @@ function ForgetPassword({navigation}) {
           <BackButton handleBackNext={handleBackNext} />
         </View>
         <View style={styles.inputSeaction}>
-          <Text style={styles.forgotPasswordText}>Forgot Password</Text>
+          <Text style={styles.forgotPasswordText}>
+            {i18n.t('common.forgotPassword')}
+          </Text>
         </View>
 
         <View style={styles.inputSeaction}>
-          <Text style={styles.lableText}>Email</Text>
+          <Text style={styles.lableText}> {i18n.t('common.email')}</Text>
           <TextInput
             style={styles.inputStyle}
-            placeholder="Enter your email"
+            placeholder={i18n.t('common.enterEmail')}
             placeholderTextColor={Colors.darkGray}
             keyboardType="email-address"
             autoCapitalize="none"
@@ -88,7 +91,7 @@ function ForgetPassword({navigation}) {
 
         <View>
           <TouchableOpacity style={styles.buttonNext} onPress={sendOtp}>
-            <Text style={styles.buttonText}>Next</Text>
+            <Text style={styles.buttonText}>{i18n.t('common.next')}</Text>
           </TouchableOpacity>
         </View>
       </View>

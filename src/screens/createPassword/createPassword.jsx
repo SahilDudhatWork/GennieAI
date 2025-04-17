@@ -12,6 +12,7 @@ import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import axios from '../../../axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../../localization/i18n';
 
 function CreatePassword({navigation}) {
   const Height = Dimensions.get('window').height;
@@ -78,15 +79,19 @@ function CreatePassword({navigation}) {
           <BackButton handleBackNext={handleBackNext} />
         </View>
         <View style={styles.inputSeaction}>
-          <Text style={styles.newPasswordText}>New Password</Text>
+          <Text style={styles.newPasswordText}>
+            {i18n.t('createPasswordPage.newPassword')}
+          </Text>
         </View>
 
         {/* Password */}
         <View style={{paddingTop: 20}}>
-          <Text style={styles.lableText}>New Password</Text>
+          <Text style={styles.lableText}>
+            {i18n.t('createPasswordPage.newPassword')}
+          </Text>
           <TextInput
             style={styles.inputStyle}
-            placeholder="Enter your new password"
+            placeholder={i18n.t('createPasswordPage.enterNewPassword')}
             placeholderTextColor={Colors.darkGray}
             secureTextEntry
             autoCapitalize="none"
@@ -100,10 +105,12 @@ function CreatePassword({navigation}) {
 
         {/*Re-enter Password */}
         <View style={{paddingTop: 10}}>
-          <Text style={styles.lableText}>Re-enter Password</Text>
+          <Text style={styles.lableText}>
+            {i18n.t('createPasswordPage.reEnterPassword')}
+          </Text>
           <TextInput
             style={styles.inputStyle}
-            placeholder="Enter your re-enter password"
+            placeholder={i18n.t('createPasswordPage.enterReEnterPassword')}
             placeholderTextColor={Colors.darkGray}
             secureTextEntry
             autoCapitalize="none"
@@ -121,7 +128,7 @@ function CreatePassword({navigation}) {
 
         <View>
           <TouchableOpacity style={styles.buttonNext} onPress={changePassword}>
-            <Text style={styles.buttonText}>Next</Text>
+            <Text style={styles.buttonText}> {i18n.t('common.next')}</Text>
           </TouchableOpacity>
         </View>
       </View>

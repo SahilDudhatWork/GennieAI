@@ -10,6 +10,7 @@ import {
 } from './Icons';
 import {Colors, FontFamily} from '../../Utils/Themes';
 import {useNavigation} from '@react-navigation/native';
+import i18n from '../localization/i18n';
 
 const BottomNavigator = ({selectedTab, setSelectedTab}) => {
   const navigation = useNavigation();
@@ -36,7 +37,7 @@ const BottomNavigator = ({selectedTab, setSelectedTab}) => {
             styles.label,
             selectedTab === 'Chat' && styles.selectedLabel,
           ]}>
-          Chat
+          {i18n.t('onBordingPage.chat')}
         </Text>
       </TouchableOpacity>
 
@@ -55,7 +56,7 @@ const BottomNavigator = ({selectedTab, setSelectedTab}) => {
             styles.label,
             selectedTab === 'History' && styles.selectedLabel,
           ]}>
-          History
+          {i18n.t('chatHistoryPage.history')}
         </Text>
       </TouchableOpacity>
 
@@ -74,7 +75,7 @@ const BottomNavigator = ({selectedTab, setSelectedTab}) => {
             styles.label,
             selectedTab === 'Profile' && styles.selectedLabel,
           ]}>
-          Profile
+          {i18n.t('onBordingPage.profile')}
         </Text>
       </TouchableOpacity>
     </View>
