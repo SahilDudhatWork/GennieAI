@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Animatable from 'react-native-animatable';
-import {CircleIcon, DownArrowIcon} from '../../components/Icons';
+import {CircleIcon, RightArrowIcon} from '../../components/Icons';
 import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import Tts from 'react-native-tts';
@@ -37,7 +37,7 @@ const Dot = ({size, color, style, animation, delay = 0}) => (
     ]}
   />
 );
-const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
+const Step1 = ({handleDownArrowStep1, handleSkipStep1, handleBackNext}) => {
   const navigation = useNavigation();
 
   const text =
@@ -62,10 +62,6 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
       Tts.stop();
     };
   }, []);
-
-  const handleBackNext = () => {
-    navigation.goBack();
-  };
 
   return (
     <LinearGradient colors={['#FFFFFF', '#F0F0F8']} style={styles.container}>
@@ -178,7 +174,7 @@ const Step1 = ({handleDownArrowStep1, handleSkipStep1}) => {
         duration={500}
         style={styles.downArrowIcon}>
         <TouchableOpacity onPress={handleDownArrowStep1}>
-          <DownArrowIcon />
+          <RightArrowIcon />
         </TouchableOpacity>
       </Animatable.View>
 
@@ -205,12 +201,16 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     resizeMode: 'contain',
+    width: 196,
+    height: 100,
   },
   layerImage2: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     resizeMode: 'contain',
+    width: 275,
+    height: 213,
   },
   downArrowIcon: {
     backgroundColor: Colors.deepViolet,
@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
     borderRadius: 22.5,
     position: 'absolute',
     bottom: 33,
+    right: 20,
     zIndex: 999,
-    left: width / 2 - 20,
   },
   topRow: {
     flexDirection: 'row',
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     zIndex: 99,
   },
   skipText: {
-    color: Colors.deepViolet,
+    color: Colors.white,
     fontSize: 16,
     fontWeight: '700',
     fontFamily: FontFamily.TimeRoman,
