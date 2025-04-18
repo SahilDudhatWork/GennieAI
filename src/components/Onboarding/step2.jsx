@@ -9,7 +9,7 @@ import {
   ImageBackground,
   Platform,
 } from 'react-native';
-import {CircleIcon, DownArrowIcon} from '../../components/Icons';
+import {CircleIcon, RightArrowIcon} from '../../components/Icons';
 import BackButton from '../../components/BackButton';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import * as Animatable from 'react-native-animatable';
@@ -39,7 +39,7 @@ const Dot = ({size, color, style, animation, delay = 0}) => (
   />
 );
 
-const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
+const Step2 = ({handleDownArrowStep2, handleSkipStep2, handleBackNext}) => {
   const navigation = useNavigation();
 
   const text =
@@ -61,10 +61,6 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
       Tts.stop();
     };
   }, []);
-
-  const handleBackNext = () => {
-    navigation.goBack();
-  };
 
   return (
     <ImageBackground
@@ -170,7 +166,7 @@ const Step2 = ({handleDownArrowStep2, handleSkipStep2}) => {
         duration={500}
         style={styles.downArrowIcon}>
         <TouchableOpacity onPress={handleDownArrowStep2}>
-          <DownArrowIcon />
+          <RightArrowIcon />
         </TouchableOpacity>
       </Animatable.View>
     </ImageBackground>
@@ -193,8 +189,8 @@ const styles = StyleSheet.create({
     borderRadius: 22.5,
     position: 'absolute',
     bottom: 33,
+    right: 20,
     zIndex: 999,
-    left: width / 2 - 20,
   },
   topRow: {
     flexDirection: 'row',
