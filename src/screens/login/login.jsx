@@ -12,7 +12,8 @@ import {
   Platform,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  BackHandler,
 } from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import ScreenWrapper from '../../components/ScreenWrapper';
@@ -85,11 +86,14 @@ function Login({navigation}) {
           const isTermsConditions = await AsyncStorage.getItem(
             'isTermsConditions',
           );
+          const isOnbording = await AsyncStorage.getItem('isOnbording');
           const isLanguage = await AsyncStorage.getItem('isLanguage');
           if (!isLanguage) {
             navigation.navigate('SelectLanguage');
           } else if (!isTermsConditions) {
             navigation.navigate('TermsConditions');
+          } else if (!isOnbording) {
+            navigation.navigate('Onbording');
           } else {
             navigation.navigate('Main', {screen: 'Chat'});
           }
@@ -131,11 +135,14 @@ function Login({navigation}) {
             const isTermsConditions = await AsyncStorage.getItem(
               'isTermsConditions',
             );
+            const isOnbording = await AsyncStorage.getItem('isOnbording');
             const isLanguage = await AsyncStorage.getItem('isLanguage');
             if (!isLanguage) {
               navigation.navigate('SelectLanguage');
             } else if (!isTermsConditions) {
               navigation.navigate('TermsConditions');
+            } else if (!isOnbording) {
+              navigation.navigate('isOnbording');
             } else {
               navigation.navigate('Main', {screen: 'Chat'});
             }
@@ -196,6 +203,7 @@ function Login({navigation}) {
             fullName: displayName,
             email: emailData,
             loginType: 'Apple',
+            appleId: user,
           };
 
           setLoading(true);
@@ -211,11 +219,14 @@ function Login({navigation}) {
                 const isTermsConditions = await AsyncStorage.getItem(
                   'isTermsConditions',
                 );
+                const isOnbording = await AsyncStorage.getItem('isOnbording');
                 const isLanguage = await AsyncStorage.getItem('isLanguage');
                 if (!isLanguage) {
                   navigation.navigate('SelectLanguage');
                 } else if (!isTermsConditions) {
                   navigation.navigate('TermsConditions');
+                } else if (!isOnbording) {
+                  navigation.navigate('isOnbording');
                 } else {
                   navigation.navigate('Main', {screen: 'Chat'});
                 }
@@ -243,161 +254,182 @@ function Login({navigation}) {
     }
   };
 
-  const handleBackNext = () => {
-    navigation.goBack();
-  };
+  useEffect(() => {
+    const backAction = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <>
-    <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{ flex: 1 }}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={{ flex: 1 }}>
       <ScreenWrapper>
-        <ScrollView
-          style={styles.container}
-            contentContainerStyle={{ paddingBottom: 30 }}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={{flex: 1}}>
+              <ScrollView
+                style={styles.container}
+                contentContainerStyle={{paddingBottom: 30}}
                 keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          <View
-            style={{
-              height: Height - 40,
-            }}>
-            <View>
-              <BackButton handleBackNext={handleBackNext} />
-            </View>
-            <View style={styles.inputSeaction}>
-              <Text style={styles.loginTitleText}>
-                {i18n.t('common.login')}
-              </Text>
-              <Text style={styles.welcomeBackText}>
-                {i18n.t('loginPage.welcomeBack')}
-              </Text>
-            </View>
-            <View>
-              <View style={styles.inputSeaction}>
-                <Text style={styles.lableText}> {i18n.t('common.email')}</Text>
-                <View style={styles.inputWrapper}>
-                  <EmailIcon style={styles.iconStyle} />
-                  <TextInput
-                    style={styles.inputStyle}
-                    placeholder={i18n.t('common.enterEmail')}
-                    placeholderTextColor={Colors.darkGray}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    onChangeText={text =>
-                      setUserData({...userData, email: text})
-                    }
-                  />
-                </View>
-              </View>
-              {validationErrors?.email && (
-                <Text style={styles.errorText}>{validationErrors?.email}</Text>
-              )}
-              {apiErrorMsg != '' && (
-                <Text style={styles.errorText}>{apiErrorMsg}</Text>
-              )}
-              {/* Password */}
-              <View style={{paddingTop: 10}}>
-                <Text style={styles.lableText}>
-                  {' '}
-                  {i18n.t('common.password')}
-                </Text>
-                <View style={styles.inputWrapper}>
-                  <LockIcon style={styles.iconStyle} />
-                  <TextInput
-                    style={styles.inputStyle}
-                    placeholder={i18n.t('common.enterPassword')}
-                    placeholderTextColor={Colors.darkGray}
-                    secureTextEntry
-                    autoCapitalize="none"
-                    onChangeText={text =>
-                      setUserData({...userData, password: text})
-                    }
-                  />
-                </View>
-              </View>
-              {validationErrors?.password && (
-                <Text style={styles.errorText}>
-                  {validationErrors?.password}
-                </Text>
-              )}
-              <View>
-                <Text
-                  onPress={() => {
-                    navigation.navigate('ForgotPassword');
-                  }}
-                  style={styles.forgotPasswordText}>
-                  {i18n.t('common.forgotPassword')}?
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={styles.buttonLogin}
-                onPress={handleLogin}>
-                <Text style={styles.buttonLoginText}>
-                  {' '}
-                  {i18n.t('common.login')}
-                </Text>
-              </TouchableOpacity>
-
-              <View style={styles.orSignContainer}>
+                showsVerticalScrollIndicator={false}>
                 <View
-                  style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
-                />
-                <Text style={styles.orSignText}>
-                  {' '}
-                  {i18n.t('loginPage.orSignInWith')}
-                </Text>
-                <View
-                  style={{flex: 1, height: 1, backgroundColor: Colors.darkGray}}
-                />
-              </View>
-              <View style={styles.signupOr}>
-                <TouchableOpacity onPress={handleGoogleLogin}>
-                  <Image
-                    source={require('../../assets/Images/auth/google.png')}
-                    style={{width: 40, height: 40}}
-                  />
-                </TouchableOpacity>
-
-                {Platform.OS === 'ios' && (
-                  <TouchableOpacity onPress={handleAppleLogin}>
-                    <Image
-                      source={require('../../assets/Images/auth/apple.png')}
-                      style={{width: 40, height: 40}}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-            <View
-              style={{
-                position: 'absolute',
-                bottom: Platform.OS === 'ios' ? 50 : 0,
-                width: '100%',
-              }}>
-              <Text style={styles.accountText}>
-                {i18n.t('loginPage.dontHaveAccount')}?{' '}
-                <Text
                   style={{
-                    textDecorationLine: 'underline',
-                    color: Colors.deepViolet,
-                  }}
-                  onPress={() => {
-                    navigation.navigate('Signup');
+                    height: Height - 40,
                   }}>
-                  {i18n.t('loginPage.createCccount')}
-                </Text>
-              </Text>
+                  <View style={styles.inputSeaction}>
+                    <Text style={styles.loginTitleText}>
+                      {i18n.t('common.login')}
+                    </Text>
+                    <Text style={styles.welcomeBackText}>
+                      {i18n.t('loginPage.welcomeBack')}
+                    </Text>
+                  </View>
+                  <View>
+                    <View style={styles.inputSeaction}>
+                      <Text style={styles.lableText}>
+                        {' '}
+                        {i18n.t('common.email')}
+                      </Text>
+                      <View style={styles.inputWrapper}>
+                        <EmailIcon style={styles.iconStyle} />
+                        <TextInput
+                          style={styles.inputStyle}
+                          placeholder={i18n.t('common.enterEmail')}
+                          placeholderTextColor={Colors.darkGray}
+                          keyboardType="email-address"
+                          autoCapitalize="none"
+                          onChangeText={text =>
+                            setUserData({...userData, email: text})
+                          }
+                        />
+                      </View>
+                    </View>
+                    {validationErrors?.email && (
+                      <Text style={styles.errorText}>
+                        {validationErrors?.email}
+                      </Text>
+                    )}
+                    {apiErrorMsg != '' && (
+                      <Text style={styles.errorText}>{apiErrorMsg}</Text>
+                    )}
+                    {/* Password */}
+                    <View style={{paddingTop: 10}}>
+                      <Text style={styles.lableText}>
+                        {' '}
+                        {i18n.t('common.password')}
+                      </Text>
+                      <View style={styles.inputWrapper}>
+                        <LockIcon style={styles.iconStyle} />
+                        <TextInput
+                          style={styles.inputStyle}
+                          placeholder={i18n.t('common.enterPassword')}
+                          placeholderTextColor={Colors.darkGray}
+                          secureTextEntry
+                          autoCapitalize="none"
+                          onChangeText={text =>
+                            setUserData({...userData, password: text})
+                          }
+                        />
+                      </View>
+                    </View>
+                    {validationErrors?.password && (
+                      <Text style={styles.errorText}>
+                        {validationErrors?.password}
+                      </Text>
+                    )}
+                    <View>
+                      <Text
+                        onPress={() => {
+                          navigation.navigate('ForgotPassword');
+                        }}
+                        style={styles.forgotPasswordText}>
+                        {i18n.t('common.forgotPassword')}?
+                      </Text>
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.buttonLogin}
+                      onPress={handleLogin}>
+                      <Text style={styles.buttonLoginText}>
+                        {' '}
+                        {i18n.t('common.login')}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.orSignContainer}>
+                      <View
+                        style={{
+                          flex: 1,
+                          height: 1,
+                          backgroundColor: Colors.darkGray,
+                        }}
+                      />
+                      <Text style={styles.orSignText}>
+                        {' '}
+                        {i18n.t('loginPage.orSignInWith')}
+                      </Text>
+                      <View
+                        style={{
+                          flex: 1,
+                          height: 1,
+                          backgroundColor: Colors.darkGray,
+                        }}
+                      />
+                    </View>
+                    <View style={styles.signupOr}>
+                      <TouchableOpacity onPress={handleGoogleLogin}>
+                        <Image
+                          source={require('../../assets/Images/auth/google.png')}
+                          style={{width: 40, height: 40}}
+                        />
+                      </TouchableOpacity>
+
+                      {Platform.OS === 'ios' && (
+                        <TouchableOpacity onPress={handleAppleLogin}>
+                          <Image
+                            source={require('../../assets/Images/auth/apple.png')}
+                            style={{width: 40, height: 40}}
+                          />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      position: 'absolute',
+                      bottom: Platform.OS === 'ios' ? 50 : 0,
+                      width: '100%',
+                    }}>
+                    <Text style={styles.accountText}>
+                      {i18n.t('loginPage.dontHaveAccount')}?{' '}
+                      <Text
+                        style={{
+                          textDecorationLine: 'underline',
+                          color: Colors.deepViolet,
+                        }}
+                        onPress={() => {
+                          navigation.navigate('Signup');
+                        }}>
+                        {i18n.t('loginPage.createCccount')}
+                      </Text>
+                    </Text>
+                  </View>
+                </View>
+              </ScrollView>
             </View>
-          </View>
-        </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </ScreenWrapper>
-        </View>
-              </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
+
       {loading && (
         <View style={styles.loadingOverlay}>
           <DotIndicator color="#4A05ADCC" size={15} />

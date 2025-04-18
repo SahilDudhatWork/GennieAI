@@ -33,7 +33,7 @@
   },
 
   "splashPage": {
-    "gennie": "Gennie",
+    "gennie": "吉尼",
     "getStarted": "开始使用",
     "signIn": "登录"
   },
@@ -111,13 +111,13 @@
   "onBordingPage": {
     "profile": "个人资料",
     "chat": "聊天",
-    "gennieTitleStep1": "Gennie 是学生的导师",
-    "gennieDescriptionStep1": "Gennie 是一位智能AI导师，旨在通过个性化指导和即时支持帮助学生高效学习。",
-    "gennieTitleStep2": "Gennie 是专业人士的导师",
-    "gennieDescriptionStep2": "Gennie 是一位AI导师，为专业人士提供专家指导、职业见解和技能发展支持。",
-    "gennieTitleStep3": "Gennie 是家庭主妇的支持伙伴",
-    "gennieDescriptionStep3": "Gennie 是家庭主妇的支持AI伙伴，提供日常任务和个人成长的帮助、指导和智能解决方案。",
-    "gennieTitleStep4": "Gennie 是老年人的耐心倾听者",
-    "gennieDescriptionStep4": "Gennie 是老年人的耐心AI倾听者，提供陪伴、有意义的对话和周到的支持。"
+    "gennieTitleStep1": "吉尼 是学生的导师",
+    "gennieDescriptionStep1": "吉尼 是一位智能AI导师，旨在通过个性化指导和即时支持帮助学生高效学习。",
+    "gennieTitleStep2": "吉尼 是专业人士的导师",
+    "gennieDescriptionStep2": "吉尼 是一位AI导师，为专业人士提供专家指导、职业见解和技能发展支持。",
+    "gennieTitleStep3": "吉尼 是家庭主妇的支持伙伴",
+    "gennieDescriptionStep3": "吉尼 是家庭主妇的支持AI伙伴，提供日常任务和个人成长的帮助、指导和智能解决方案。",
+    "gennieTitleStep4": "吉尼 是老年人的耐心倾听者",
+    "gennieDescriptionStep4": "吉尼 是老年人的耐心AI倾听者，提供陪伴、有意义的对话和周到的支持。"
   }
 }

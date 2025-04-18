@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import {
   StyleSheet,
@@ -10,7 +10,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import {Colors, FontFamily} from '../../../Utils/Themes';
 import {LogOutIcon, ProfileEditIcon} from '../../components/Icons';
@@ -19,10 +21,17 @@ import axios from '../../../axios';
 import {DotIndicator} from 'react-native-indicators';
 import {useFocusEffect, useRoute} from '@react-navigation/native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import i18n from '../../localization/i18n';
+import i18n, {setI18nConfig} from '../../localization/i18n';
+import DropDownPicker from 'react-native-dropdown-picker';
+import CountryFlag from 'react-native-country-flag';
+
+const Height = Dimensions.get('window').height;
 
 function UpdateProfile({navigation}) {
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [languageUpdated, setLanguageUpdated] = useState(false);
   const [userData, setUserData] = useState({
     fullName: '',
     email: '',
@@ -43,6 +52,24 @@ function UpdateProfile({navigation}) {
 
   const route = useRoute();
 
+  useEffect(() => {
+    const loadLanguage = async () => {
+      const savedLang = await AsyncStorage.getItem('appLanguage');
+      if (savedLang) {
+        setSelectedLanguage(savedLang);
+        await setI18nConfig(savedLang);
+        setLanguageUpdated(prev => !prev);
+      }
+    };
+    loadLanguage();
+  }, []);
+
+  const onLanguageChange = async val => {
+    setSelectedLanguage(val);
+    await setI18nConfig(val);
+    setLanguageUpdated(prev => !prev);
+  };
+
   useFocusEffect(
     useCallback(() => {
       if (route.params?.setSelectedTab) {
@@ -50,6 +77,29 @@ function UpdateProfile({navigation}) {
       }
     }, [route.params]),
   );
+
+  const languageOptions = useMemo(() => {
+    const options = [
+      {name: 'English', code: 'en', countryCode: 'US'},
+      {name: 'Hindi', code: 'hi', countryCode: 'IN'},
+      {name: 'French', code: 'fr', countryCode: 'FR'},
+      {name: 'Chinese', code: 'zh', countryCode: 'CN'},
+    ];
+
+    return options.map(lang => ({
+      label: (
+        <View style={styles.languageItem}>
+          <CountryFlag
+            isoCode={lang.countryCode}
+            size={25}
+            style={styles.flag}
+          />
+          <Text style={styles.languageText}>{lang.name}</Text>
+        </View>
+      ),
+      value: lang.code,
+    }));
+  }, []);
 
   const handleImagePick = () => {
     launchImageLibrary({mediaType: 'photo'}, response => {
@@ -115,6 +165,7 @@ function UpdateProfile({navigation}) {
     if (Object.values(errors).some(error => error !== '')) {
       return;
     }
+    await AsyncStorage.setItem('appLanguage', selectedLanguage);
     setLoading(true);
     axios
       .put('/v1/user/profile', userData)
@@ -137,127 +188,167 @@ function UpdateProfile({navigation}) {
   }, []);
   return (
     <>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1 }}>
-            <ScreenWrapper>
-              <ScrollView
-                style={styles.container}
-                contentContainerStyle={{ paddingBottom: 30 }}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}>
-                <View>
-                  <View style={styles.profileImageContainer}>
-                    <View style={{ position: 'relative' }}>
-                      <Image
-                        source={require('../../assets/Images/profile-user.png')}
-                        style={styles.profileImage}
-                      />
-                      <TouchableOpacity
-                        style={styles.profileEditIcon}
-                        onPress={handleImagePick}>
-                        <ProfileEditIcon />
-                      </TouchableOpacity>
-                    </View>
-                    <View>
-                      <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
-                      <Text style={styles.emailText}>{userDisplay?.email}</Text>
-                      <TouchableOpacity
+      <ScreenWrapper>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ScrollView
+              style={styles.container}
+              contentContainerStyle={{paddingBottom: 30}}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              <View>
+                <View style={styles.profileImageContainer}>
+                  <View style={{position: 'relative'}}>
+                    <Image
+                      source={require('../../assets/Images/default-user.webp')}
+                      style={styles.profileImage}
+                    />
+                    <TouchableOpacity
+                      style={styles.profileEditIcon}
+                      onPress={handleImagePick}>
+                      <ProfileEditIcon />
+                    </TouchableOpacity>
+                  </View>
+                  <View>
+                    <Text style={styles.nameText}>{userDisplay?.fullName}</Text>
+                    <Text style={styles.emailText}>{userDisplay?.email}</Text>
+                    <TouchableOpacity
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        gap: 12,
+                        paddingTop: 7,
+                      }}
+                      activeOpacity={0.5}
+                      onPress={handleLogout}>
+                      <View
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           flexDirection: 'row',
                           gap: 12,
-                          paddingTop: 7,
-                        }}
-                        activeOpacity={0.5}
-                        onPress={handleLogout}>
+                        }}>
                         <View style={styles.logOutIcon}>
                           <LogOutIcon />
                         </View>
-                  <Text style={styles.logOutText}>
-                    {i18n.t('profilePage.logout')}
-                  </Text>
+                        <Text style={styles.logOutText}>
+                          {i18n.t('profilePage.logout')}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => navigation.navigate('AboutUs')}>
+                        <Image
+                          source={require('../../assets/Images/aboutUs.png')}
+                          style={styles.aboutUsImage}
+                        />
                       </TouchableOpacity>
-                    </View>
-                  </View>
-  
-                  {/* Name */}
-            <View style={{paddingTop: 20}}>
-              <Text style={styles.lableText}> {i18n.t('common.name')}</Text>
-                    <TextInput
-                      style={styles.inputStyle}
-                placeholder={i18n.t('common.enterName')}
-                      placeholderTextColor={Colors.darkGray}
-                      autoCapitalize="none"
-                      value={userData?.fullName}
-                      onChangeText={text =>
-                        setUserData({ ...userData, fullName: text })
-                      }
-                    />
-                  </View>
-                  {validationErrors?.fullName && (
-                    <Text style={styles.errorText}>
-                      {validationErrors?.fullName}
-                    </Text>
-                  )}
-  
-                  {/* Email */}
-            <View style={{paddingTop: 10}}>
-              <Text style={styles.lableText}>{i18n.t('common.email')}</Text>
-                    <TextInput
-                      style={styles.inputStyle}
-                placeholder={i18n.t('common.enterEmail')}
-                      placeholderTextColor={Colors.darkGray}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      value={userData?.email}
-                      editable={false}
-                    />
-                  </View>
-  
-                  {/* Phone number */}
-            <View style={{paddingTop: 10}}>
-              <Text style={styles.lableText}>
-                {i18n.t('common.phoneNumber')}
-              </Text>
-                    <TextInput
-                      style={styles.inputStyle}
-                placeholder={i18n.t('common.enterPhoneNumber')}
-                      placeholderTextColor={Colors.darkGray}
-                      autoCapitalize="none"
-                      keyboardType="numeric"
-                      value={userData.mobile}
-                      onChangeText={text =>
-                        setUserData({ ...userData, mobile: text })
-                      }
-                    />
-                  </View>
-                  {validationErrors?.mobile && (
-                    <Text style={styles.errorText}>
-                      {validationErrors?.mobile}
-                    </Text>
-                  )}
-  
-                  {/* Update Button */}
-                  <View style={{ paddingTop: 20 }}>
-                    <TouchableOpacity
-                      style={styles.buttonNext}
-                      onPress={handleUpdateProfile}>
-                <Text style={styles.buttonText}>
-                  {i18n.t('profilePage.updateProfile')}
-                </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
-              </ScrollView>
-            </ScreenWrapper>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-  
+
+                {/* Name */}
+                <View style={{paddingTop: 20}}>
+                  <Text style={styles.lableText}> {i18n.t('common.name')}</Text>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder={i18n.t('common.enterName')}
+                    placeholderTextColor={Colors.darkGray}
+                    autoCapitalize="none"
+                    value={userData?.fullName}
+                    onChangeText={text =>
+                      setUserData({...userData, fullName: text})
+                    }
+                  />
+                </View>
+                {validationErrors?.fullName && (
+                  <Text style={styles.errorText}>
+                    {validationErrors?.fullName}
+                  </Text>
+                )}
+
+                {/* Email */}
+                <View style={{paddingTop: 10}}>
+                  <Text style={styles.lableText}>{i18n.t('common.email')}</Text>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder={i18n.t('common.enterEmail')}
+                    placeholderTextColor={Colors.darkGray}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={userData?.email}
+                    editable={false}
+                  />
+                </View>
+
+                {/* Phone number */}
+                <View style={{paddingTop: 10}}>
+                  <Text style={styles.lableText}>
+                    {i18n.t('common.phoneNumber')}
+                  </Text>
+                  <TextInput
+                    style={styles.inputStyle}
+                    placeholder={i18n.t('common.enterPhoneNumber')}
+                    placeholderTextColor={Colors.darkGray}
+                    autoCapitalize="none"
+                    keyboardType="numeric"
+                    value={userData.mobile}
+                    onChangeText={text =>
+                      setUserData({...userData, mobile: text})
+                    }
+                  />
+                </View>
+                {validationErrors?.mobile && (
+                  <Text style={styles.errorText}>
+                    {validationErrors?.mobile}
+                  </Text>
+                )}
+
+                <View style={{paddingTop: 10}}>
+                  <Text style={styles.lableText}>
+                    {i18n.t('selectLanguagePage.selectYourLanguage')}
+                  </Text>
+
+                  <DropDownPicker
+                    open={open}
+                    value={selectedLanguage}
+                    items={languageOptions}
+                    setOpen={setOpen}
+                    setValue={setSelectedLanguage}
+                    onChangeValue={onLanguageChange}
+                    placeholder="Choose a language..."
+                    style={styles.dropdown}
+                    dropDownContainerStyle={[
+                      styles.dropdownContainer,
+                      {backgroundColor: open ? Colors.white : '#FFFFFF59'},
+                    ]}
+                    textStyle={styles.dropdownTextStyle}
+                    labelStyle={styles.dropdownLabelStyle}
+                    listMode="SCROLLVIEW"
+                    dropDownDirection="AUTO"
+                    autoScroll
+                  />
+                </View>
+
+                {/* Update Button */}
+                <View style={{paddingTop: 20}}>
+                  <TouchableOpacity
+                    style={styles.buttonNext}
+                    onPress={handleUpdateProfile}>
+                    <Text style={styles.buttonText}>
+                      {i18n.t('profilePage.updateProfile')}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </ScreenWrapper>
+
       {loading && (
         <View style={styles.loadingOverlay}>
           <DotIndicator color="#4A05ADCC" size={15} />
@@ -265,12 +356,60 @@ function UpdateProfile({navigation}) {
       )}
     </>
   );
-  
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  languageItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  languageText: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: Colors.darkBlack,
+    fontFamily: FontFamily.SpaceGrotesk,
+  },
+  selectLanguageText: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: Colors.deepViolet,
+    fontFamily: FontFamily.SpaceGroteskBold,
+    textAlign: 'center',
+  },
+  dropdown: {
+    marginTop: 5,
+    borderWidth: 1,
+    borderColor: Colors.darkGray,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF59',
+  },
+  dropdownContainer: {
+    marginTop: 20,
+    borderWidth: 1,
+    borderRadius: 12,
+    borderColor: Colors.darkGray,
+    maxHeight: Height - 360,
+  },
+  dropdownTextStyle: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: Colors.darkBlack,
+    fontFamily: FontFamily.SpaceGrotesk,
+  },
+  dropdownLabelStyle: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: Colors.darkGray,
+    fontFamily: FontFamily.SpaceGrotesk,
+  },
+  flag: {
+    marginRight: 10,
+    borderRadius: 4,
+    width: 26,
+    height: 20,
   },
   loadingOverlay: {
     position: 'absolute',
@@ -299,6 +438,15 @@ const styles = StyleSheet.create({
   logOutIcon: {
     width: 22,
     height: 22,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 100,
+    backgroundColor: '#4A05ADCC',
+  },
+  aboutUsImage: {
+    width: 30,
+    height: 30,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
