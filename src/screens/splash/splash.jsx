@@ -19,68 +19,74 @@ function Splash({navigation}) {
   const [isContentShow, setIsContentShow] = useState(false);
 
   const getStarted = async () => {
-    const token = await AsyncStorage.getItem('token');
-    if (!token) {
-      navigation.navigate('Onboarding');
-    } else {
-      // navigation.navigate('SelectLanguage');
-      const isLanguage = await AsyncStorage.getItem('isLanguage');
-      const isTermsConditions = await AsyncStorage.getItem('isTermsConditions');
-      if (!isLanguage) {
-        navigation.navigate('SelectLanguage');
-      } else if (!isTermsConditions) {
-        navigation.navigate('TermsConditions');
-      } else {
-        navigation.navigate('Main', {screen: 'Chat'});
-      }
+    const isSplash = await AsyncStorage.getItem('isSplash');
+    if (!isSplash) {
+      await AsyncStorage.setItem('isSplash', 'true');
     }
+    navigation.navigate('Login');
   };
+
   useEffect(() => {
-    const checkToken = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        // navigation.navigate('SelectLanguage');
-        // navigation.navigate('Main', {screen: 'Chat'});
+    const checkAppStatus = async () => {
+      const storedToken = await AsyncStorage.getItem('token');
+      if (storedToken) {
         const isTermsConditions = await AsyncStorage.getItem(
           'isTermsConditions',
         );
+        const isOnboarding = await AsyncStorage.getItem('isOnbording');
         const isLanguage = await AsyncStorage.getItem('isLanguage');
+
         if (!isLanguage) {
           navigation.navigate('SelectLanguage');
+          return;
         } else if (!isTermsConditions) {
           navigation.navigate('TermsConditions');
+          return;
+        } else if (!isOnboarding) {
+          navigation.navigate('Onboarding');
+          return;
         } else {
-          navigation.navigate('Main', {screen: 'Chat'});
+          navigation.navigate('Main');
+          return;
         }
-        return;
+      } else {
+        const isSplash = await AsyncStorage.getItem('isSplash');
+        if (isSplash) {
+          navigation.navigate('Login');
+          return;
+        } else {
+          navigation.navigate('Splash');
+        }
       }
-
-      setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleAnim, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          setTimeout(() => {
-            Animated.spring(translateYAnim, {
-              toValue: -60,
-              useNativeDriver: true,
-            }).start(() => {
-              setIsContentShow(true);
-            });
-          }, 1500);
-        });
-      }, 1500);
     };
 
-    checkToken();
+    checkAppStatus();
+
+    const animationTimer = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setTimeout(() => {
+          Animated.spring(translateYAnim, {
+            toValue: -60,
+            useNativeDriver: true,
+          }).start(() => {
+            setIsContentShow(true);
+          });
+        }, 1500);
+      });
+    }, 1500);
+
+    return () => clearTimeout(animationTimer);
   }, []);
 
   return (
@@ -113,11 +119,7 @@ function Splash({navigation}) {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.buttonSignIn}
-              onPress={() => {
-                navigation.navigate('Login');
-              }}>
+            <TouchableOpacity style={styles.buttonSignIn} onPress={getStarted}>
               <Text style={styles.buttonSignInText}>
                 {i18n.t('splashPage.signIn')}
               </Text>

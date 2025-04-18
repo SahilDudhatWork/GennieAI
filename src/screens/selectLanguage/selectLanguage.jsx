@@ -40,12 +40,11 @@ function SelectLanguage({navigation}) {
     }
     await AsyncStorage.setItem('appLanguage', selectedLanguage);
     setI18nConfig(selectedLanguage);
-    navigation.replace('TermsConditions');
+    navigation.navigate('TermsConditions');
   };
 
   const onLanguageChange = async val => {
     setSelectedLanguage(val);
-    await AsyncStorage.setItem('appLanguage', val);
     await setI18nConfig(val);
     setLanguageUpdated(prev => !prev);
   };
@@ -75,10 +74,6 @@ function SelectLanguage({navigation}) {
 
   return (
     <ScreenWrapper style={styles.container}>
-      <View>
-        <BackButton handleBackNext={() => navigation.goBack()} />
-      </View>
-
       <View style={{paddingTop: 80}}>
         <Text style={styles.selectLanguageText}>
           {i18n.t('selectLanguagePage.selectYourLanguage')}

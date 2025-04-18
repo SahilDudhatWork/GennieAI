@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, SafeAreaView} from 'react-native';
+import {Keyboard, Platform, SafeAreaView} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Chat from '../screens/chat/chat';
 import ChatHistory from '../screens/chatHistory/chatHistory';
@@ -13,18 +13,20 @@ const BottomTabs = () => {
   const [keyboardShown, setKeyboardShown] = useState(false);
 
   useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-      setKeyboardShown(true);
-    });
+    if (Platform.OS != 'ios') {
+      const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+        setKeyboardShown(true);
+      });
 
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-      setKeyboardShown(false);
-    });
+      const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+        setKeyboardShown(false);
+      });
 
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
+      return () => {
+        showSubscription.remove();
+        hideSubscription.remove();
+      };
+    }
   }, []);
 
   return (
